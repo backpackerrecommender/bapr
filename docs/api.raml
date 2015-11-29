@@ -1,0 +1,232 @@
+#%RAML 0.8
+baseUri: http://mocksvc.mulesoft.com/mocks/6311096a-f2fa-4e97-90d9-97e830077521
+title: wade-bapr
+version: 1
+/location:
+  get:
+    description: Get the name of the current location
+    queryParameters:
+      latitude:
+        displayName: Latitude
+        type: number
+        example: 45.57394999
+        required: true
+      longitude:
+        displayName: Longitude
+        type: number
+        example: 25.57394999
+        required: true
+    responses:  
+      200:
+        body: 
+          application/json:
+            example: |
+              {
+                "location" : 
+                  {
+                    "name": "Iasi, Romania",
+                    "address": "Str. ABC, no. 2"
+                  },
+                  "success": True,
+                  "status": 200
+              }
+/locations:
+  displayName: locations
+  get:
+    description: Get the first 10 locations nearby
+    queryParameters:
+      latitude:
+        displayName: Latitude
+        type: number
+        example: 45.57394999
+        required: true
+      longitude:
+        displayName: Longitude
+        type: number
+        example: 25.57394999
+        required: true
+      searchText:
+        displayName: searchText
+        type: string
+        example: "adventure park"
+        required: false
+    responses:  
+      200:
+        body: 
+          application/json:
+            example: |
+              locations:
+                [
+                  {
+                    "id": "hgg555iuertgkr9556",
+                    "name": "Restaurant Oscar",
+                    "address": "Str. ABC, no. 2",
+                    "coordinates": {
+                      "latitude": 45.565576867,
+                      "longitude":25.6887844
+                    }
+                    "opening_ hours": {
+                      "open_now": false,
+                      "weekday_text": []
+                    }
+                  },
+                  {
+                    "id": "87uerg85ryigtfuy",
+                    "name": "Hotel Unirea",
+                    "address": "Str. XZY, no. 7",
+                    "coordinates": {
+                      "latitude": 45.765934805,
+                      "longitude":25.64835490
+                    }
+                    "opening_ hours": {
+                      "open_now": true,
+                      "weekday_text": []
+                    }
+                  }
+                 
+                ],
+                 "success": True,
+                 "status": 200
+  /{id}:
+    displayName: location
+    get:
+      description: Get details about a location based on id
+      responses:  
+        200:
+          body: 
+            application/json:
+              example: |
+                {
+                  "location" : 
+                    {
+                      "id": "87uerg85ryigtfuy",
+                      "name": "Hotel Unirea",
+                      "address": "Str. XZY, no. 7",
+                      "coordinates": {
+                        "latitude": 45.765934805,
+                        "longitude":25.64835490
+                      }
+                      "opening_ hours": {
+                        "open_now": true,
+                        "weekday_text": []
+                      }
+                    },
+                    "success": True,
+                    "status": 200
+                }
+  /restaurants:
+    displayName: restaurants
+    get:
+      description: Get the first 10 restaurants nearby
+      queryParameters:
+        latitude:
+          displayName: Latitude
+          type: number
+          example: 45.57394999
+          required: true
+        longitude:
+          displayName: Longitude
+          type: number
+          example: 25.57394999
+          required: true
+      responses:  
+        200:
+          body: 
+            application/json:
+              example: |
+                locations: [],
+                "success": true,
+                "status": 200
+  /hotels:
+    displayName: hotels
+    get:
+      description: Get the first 10 hotels nearby
+      queryParameters:
+        latitude:
+          displayName: Latitude
+          type: number
+          example: 45.57394999
+          required: true
+        longitude:
+          displayName: Longitude
+          type: number
+          example: 25.57394999
+          required: true
+      responses:  
+        200:
+          body: 
+            application/json:
+              example: |
+                locations: [],
+                "success": true,
+                "status": 200
+  /hospitals:
+    displayName: hospitals
+    get:
+      description: Get the first 10 hospitals nearby
+      queryParameters:
+        latitude:
+          displayName: Latitude
+          type: number
+          example: 45.57394999
+          required: true
+        longitude:
+          displayName: Longitude
+          type: number
+          example: 25.57394999
+          required: true
+      responses:  
+        200:
+          body: 
+            application/json:
+              example: |
+                locations: [],
+                "success": true,
+                "status": 200
+  /museums:
+    displayName: museums
+    get:
+      description: Get the first 10 museums nearby
+      queryParameters:
+        latitude:
+          displayName: Latitude
+          type: number
+          example: 45.57394999
+          required: true
+        longitude:
+          displayName: Longitude
+          type: number
+          example: 25.57394999
+          required: true
+      responses:  
+        200:
+          body: 
+            application/json:
+              example: |
+                locations: [],
+                "success": true,
+                "status": 200
+  /shops:
+    displayName: shops
+    get:
+      description: Get the first 10 shops nearby
+      queryParameters:
+        latitude:
+          displayName: Latitude
+          type: number
+          example: 45.57394999
+          required: true
+        longitude:
+          displayName: Longitude
+          type: number
+          example: 25.57394999
+          required: true
+      responses:  
+        200:
+          body: 
+            application/json:
+              example: |
+                locations: [],
+                "success": true,
+                "status": 200
+
