@@ -6,11 +6,13 @@ using System.Web.Mvc;
 
 namespace Bapr.Controllers
 {
-    public class HomeController : Controller
+    public class BaprController : Controller
     {
+        //
+        // GET: /Bapr/
         public ActionResult Index()
         {
             return View();
         }
-    }
+	}
 }

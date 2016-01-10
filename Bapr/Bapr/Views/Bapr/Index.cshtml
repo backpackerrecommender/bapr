@@ -1,0 +1,31 @@
+﻿@{
+    ViewBag.Title = "Bapr";
+}
+
+<h2>Welcome! You have successfully logged in</h2>
+<div id="background">
+    <div id="setLocation">
+        <div>
+            <button type="button" id="useCurrentLocation"
+                    class="btn btn-danger btn-lg" onclick="GetLocation()" />
+            Use current location
+        </div>
+        <br />
+        <br />
+        <div class="dropdown">
+            <button class="btn btn-danger btn-lg dropdown-toggle" type="button" id="useOtherLocation"
+                    data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                Choose your location
+            </button>
+            <ul class="dropdown-menu" id="dropdownOptions">
+                <li class="dropdown-item">
+                    Barcelona
+                </li>
+                <li class="dropdown-item">
+                    Lisabona
+                </li>
+            </ul>
+        </div>
+    </div>
+</div>
+

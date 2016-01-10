@@ -1,0 +1,17 @@
+﻿@{
+    ViewBag.Title = "_LoginPartial";
+}
+
+<ul id="login" class="nav navbar-nav navbar-right">
+    @if (Session["logged_username"] != null && !Session["logged_username"].ToString().Equals(""))
+    {
+        <li>@Html.ActionLink("Hello " + @Session["logged_username"].ToString() + " !", "ChangePassword", "Account")</li>
+        <li>@Html.ActionLink("Log Out", "LogOut", "Account")</li>
+    }
+    else
+    {
+        <li>@Html.ActionLink("Register", "Register", "Account", routeValues: null, htmlAttributes: new { id = "registerLink" })</li>
+        <li>@Html.ActionLink("Log in", "Login", "Account", routeValues: null, htmlAttributes: new { id = "loginLink" })</li>
+
+    }
+</ul>
