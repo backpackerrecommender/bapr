@@ -1,0 +1,16 @@
+C:\Users\Simona\bapr\Bapr\BaprAPI\bin\BaprAPI.dll.config
+C:\Users\Simona\bapr\Bapr\BaprAPI\bin\BaprAPI.dll
+C:\Users\Simona\bapr\Bapr\BaprAPI\bin\BaprAPI.pdb
+C:\Users\Simona\bapr\Bapr\BaprAPI\bin\BaprModels.dll
+C:\Users\Simona\bapr\Bapr\BaprAPI\bin\Newtonsoft.Json.dll
+C:\Users\Simona\bapr\Bapr\BaprAPI\bin\System.Net.Http.Formatting.dll
+C:\Users\Simona\bapr\Bapr\BaprAPI\bin\System.Web.Http.dll
+C:\Users\Simona\bapr\Bapr\BaprAPI\bin\System.Web.Http.WebHost.dll
+C:\Users\Simona\bapr\Bapr\BaprAPI\bin\BaprModels.pdb
+C:\Users\Simona\bapr\Bapr\BaprAPI\bin\Newtonsoft.Json.xml
+C:\Users\Simona\bapr\Bapr\BaprAPI\bin\System.Net.Http.Formatting.xml
+C:\Users\Simona\bapr\Bapr\BaprAPI\bin\System.Web.Http.xml
+C:\Users\Simona\bapr\Bapr\BaprAPI\bin\System.Web.Http.WebHost.xml
+C:\Users\Simona\bapr\Bapr\BaprAPI\obj\Debug\BaprAPI.csprojResolveAssemblyReference.cache
+C:\Users\Simona\bapr\Bapr\BaprAPI\obj\Debug\BaprAPI.dll
+C:\Users\Simona\bapr\Bapr\BaprAPI\obj\Debug\BaprAPI.pdb

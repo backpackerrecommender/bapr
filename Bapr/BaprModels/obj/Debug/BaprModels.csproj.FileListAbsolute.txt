@@ -1,0 +1,5 @@
+C:\Users\Simona\bapr\Bapr\BaprModels\bin\Debug\BaprModels.dll
+C:\Users\Simona\bapr\Bapr\BaprModels\bin\Debug\BaprModels.pdb
+C:\Users\Simona\bapr\Bapr\BaprModels\obj\Debug\BaprModels.csprojResolveAssemblyReference.cache
+C:\Users\Simona\bapr\Bapr\BaprModels\obj\Debug\BaprModels.dll
+C:\Users\Simona\bapr\Bapr\BaprModels\obj\Debug\BaprModels.pdb

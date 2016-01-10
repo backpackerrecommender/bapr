@@ -1,0 +1,74 @@
+﻿@model BaprModels.UserPreference
+
+@{
+    ViewBag.Title = "User Preferences";
+}
+
+<h2>User Preferences</h2>
+<p>@ViewBag.result </p>
+@using (Html.BeginForm())
+{
+    @Html.AntiForgeryToken()
+    
+    <div class="form-horizontal">
+
+        @Html.ValidationSummary(true)
+        <div class="form-group">
+            @Html.LabelFor(model => model.MaxBudget, new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.MaxBudget, additionalViewData: new { htmlAttributes = new { min = 1, max = long.MaxValue, Value = "100" } })
+                @Html.ValidationMessageFor(model => model.MaxBudget)
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.NoOfDays, new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.NoOfDays, additionalViewData: new { htmlAttributes = new { min = 1, max = Int32.MaxValue, Value =  "3"} })
+                @Html.ValidationMessageFor(model => model.NoOfDays)
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.NeedMedicalSupport, new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.NeedMedicalSupport)
+                @Html.ValidationMessageFor(model => model.NeedMedicalSupport)
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.Interests, new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @for (int i = 0; i < Model.Interests.Count; i++)
+                {
+                    <div>
+                        @Html.HiddenFor(x => x.Interests[i].Name)
+                        @Html.CheckBoxFor(x => x.Interests[i].Checked)
+                        @Html.LabelFor(x => x.Interests[i].Checked, Model.Interests[i].Name)
+                    </div>
+                }
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.Cuisine, new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @for (int i = 0; i < Model.Cuisine.Count; i++)
+                {
+                    <div>
+                        @Html.HiddenFor(x => x.Cuisine[i].Name)
+                        @Html.CheckBoxFor(x => x.Cuisine[i].Checked)
+                        @Html.LabelFor(x => x.Cuisine[i].Checked, Model.Cuisine[i].Name)
+                    </div>
+                }
+            </div>
+        </div>
+
+        <div class="form-group">
+            <div class="col-md-offset-2 col-md-10">
+                <input type="submit" value="Save Preferences" class="btn btn-default" />
+            </div>
+        </div>
+    </div>
+}
