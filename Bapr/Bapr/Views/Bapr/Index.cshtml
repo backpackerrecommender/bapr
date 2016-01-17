@@ -10,6 +10,7 @@
                     class="btn btn-danger btn-lg" onclick="GetLocation()" />
             Use current location
         </div>
+        @Html.Hidden("RedirectTo", Url.Action("Menu", "Bapr", new { latitude = 0, longitude = 0 }));
         <br />
         <br />
         <input id="userOtherLocation" type="text" class="btn btn-danger input-lg" placeholder="Enter new location">

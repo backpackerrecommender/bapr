@@ -1,12 +1,16 @@
 ﻿function GetLocation() {
     if (navigator.geolocation) {
         var pos = navigator.geolocation.getCurrentPosition(function (position) {
+
             var button = document.getElementById("useCurrentLocation");
             var lat = position.coords.latitude;
             var lng = position.coords.longitude
             button.setAttribute("data-lat", lat);
             button.setAttribute("data-lng", lng);
-            alert(lat + " " + lng);
+
+            //default user location
+            var url = $("#RedirectTo").val();
+            window.location.href = url.replace("latitude=0", "latitude=" + lat).replace("longitude=0", "longitude=" + lng);
         });
     } else {
         alert("not supported");
@@ -27,7 +31,8 @@ function initialize() {
         input.value = place.name;
         input.setAttribute("data-lat", lat);
         input.setAttribute("data-lng", lng);
-        alert(lat + " " + lng);
+        var url = $("#RedirectTo").val();
+        window.location.href = url.replace("latitude=0", "latitude=" + lat).replace("longitude=0", "longitude=" + lng);
     });
    
 }

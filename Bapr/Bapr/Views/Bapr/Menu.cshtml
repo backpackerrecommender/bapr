@@ -1,0 +1,33 @@
+﻿@model Bapr.Models.Location
+
+@{
+    ViewBag.Title = "Menu";
+}
+
+<h2>Menu</h2>
+
+<meta name="viewport" content="initial-scale=1.0, user-scalable=no">
+<meta charset="utf-8">
+<title>Simple markers</title>
+<style>
+    html, body {
+        height: 100%;
+        margin: 0;
+        padding: 0;
+    }
+
+    #map {
+        height: 100%;
+    }
+</style>
+<div id="map" style="width: 640px; height: 480px;"></div>
+
+<script type="text/javascript" src="/Scripts/menu.js"></script>
+<script>
+    function startMap() {
+        initMap(@Model.latitude, @Model.longitude);
+    }
+
+</script>
+<script async defer
+        src="https://maps.googleapis.com/maps/api/js?key=AIzaSyD0D3HknFGgJKip1hbsPjP6SGcoYcFGnfY&signed_in=true&callback=startMap"></script>
