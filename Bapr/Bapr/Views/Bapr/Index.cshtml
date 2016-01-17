@@ -12,20 +12,9 @@
         </div>
         <br />
         <br />
-        <div class="dropdown">
-            <button class="btn btn-danger btn-lg dropdown-toggle" type="button" id="useOtherLocation"
-                    data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
-                Choose your location
-            </button>
-            <ul class="dropdown-menu" id="dropdownOptions">
-                <li class="dropdown-item">
-                    Barcelona
-                </li>
-                <li class="dropdown-item">
-                    Lisabona
-                </li>
-            </ul>
-        </div>
+        <input id="userOtherLocation" type="text" class="btn btn-danger input-lg" placeholder="Enter new location">
     </div>
 </div>
 
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyD0D3HknFGgJKip1hbsPjP6SGcoYcFGnfY&signed_in=true&libraries=places&callback=initialize"
+        async defer></script>
