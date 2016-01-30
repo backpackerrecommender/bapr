@@ -49,3 +49,41 @@ textarea {
     width: 203px;
     height: 46px;
 }
+body,html
+{
+    height: 100%;   
+}  
+
+#map {
+    height: 80%;
+    width:70%;
+    left:28%;
+    top:10%;
+    position: absolute;
+   
+    }
+.btnsSearch {
+     position: absolute;
+      top:12%;
+      left: 2%;
+   
+}
+
+#searchTextFree {
+      position: absolute;
+      top:20%;
+      left: 2%;
+}
+
+#getPlacesByTextBtn {
+        /*background-image: url('../Content/images/magnifier.jpg');
+               background-repeat: no-repeat;
+       background-position: center;*/
+float: right;
+}
+.searchCategory{
+top: 26%;
+width: 13%;
+position: absolute;
+left: 2%;
+}

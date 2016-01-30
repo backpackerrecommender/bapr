@@ -24,7 +24,8 @@ namespace Bapr
                       "~/Scripts/respond.js"));
 
             bundles.Add(new ScriptBundle("~/bundles/BaprScripts").Include(
-                        "~/Scripts/DropdownEvents.js"));
+                        "~/Scripts/DropdownEvents.js", 
+                        "~/Scripts/menu.js"));
 
             bundles.Add(new StyleBundle("~/Content/css").Include(
                       "~/Content/bootstrap.css",

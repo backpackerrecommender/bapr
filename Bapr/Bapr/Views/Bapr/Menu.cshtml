@@ -3,31 +3,36 @@
 @{
     ViewBag.Title = "Menu";
 }
+<div class="btnsSearch">
+    <button id="btnGetFavourites" type="button" class="btn btn-danger btn-lg" data-action="@Url.Action("GetFavouritedPlaces","Bapr")">Favourites</button>
+    <button id="btnGetVisited" type="button" class="btn btn-danger btn-lg" data-action="@Url.Action("GetVisitedPlaces", "Bapr")">Visited</button>
+</div>
 
-<h2>Menu</h2>
+<div id="searchTextFree">
+    <input id="userSearchText" type="text" placeholder="Search">
+    <input id="getPlacesByTextBtn" type="button" value="Search" data-action ="@Url.Action("GetPlacesByText","Bapr")" >
+</div>
 
-<meta name="viewport" content="initial-scale=1.0, user-scalable=no">
-<meta charset="utf-8">
-<title>Simple markers</title>
-<style>
-    html, body {
-        height: 100%;
-        margin: 0;
-        padding: 0;
-    }
+<div>
 
-    #map {
-        height: 100%;
-    }
-</style>
-<div id="map" style="width: 640px; height: 480px;"></div>
+    <select class="form-control searchCategory" id="placeCategory" data-action="@Url.Action("GetPlacesByCategory","Bapr")">
+        <option value="Empty">Select a category</option>
+        <option value="Restaurants">Restaurants</option>
+        <option value="Museums">Museums</option>
+        <option value="Hotels">Hotels</option>
+        <option value="Hospitals">Hospitals</option>
 
-<script type="text/javascript" src="/Scripts/menu.js"></script>
+    </select>
+</div>
+
+    <div id="map"></div>
+
+
+<script async defer
+        src="https://maps.googleapis.com/maps/api/js?key=AIzaSyD0D3HknFGgJKip1hbsPjP6SGcoYcFGnfY&signed_in=true&callback=startMap"></script>
 <script>
     function startMap() {
         initMap(@Model.latitude, @Model.longitude);
     }
 
 </script>
-<script async defer
-        src="https://maps.googleapis.com/maps/api/js?key=AIzaSyD0D3HknFGgJKip1hbsPjP6SGcoYcFGnfY&signed_in=true&callback=startMap"></script>

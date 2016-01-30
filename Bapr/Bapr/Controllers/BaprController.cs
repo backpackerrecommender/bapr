@@ -1,9 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
-using System.Web.Mvc;
+﻿using System.Web.Mvc;
 using Bapr.Models;
+using Bapr.Utils;
 
 namespace Bapr.Controllers
 {
@@ -27,5 +24,23 @@ namespace Bapr.Controllers
                 longitude = longitude
             });
         }
+
+        public ActionResult  GetFavouritedPlaces()
+        {
+            return  Json(new {}, JsonRequestBehavior.AllowGet);
+        }
+        public ActionResult GetVisitedPlaces()
+        {
+            return Json(new { }, JsonRequestBehavior.AllowGet);
+        }
+        public ActionResult GetPlacesByText(string text)
+        {
+            return Json(text, JsonRequestBehavior.AllowGet);
+        }
+        public ActionResult GetPlacesByCategory(PlaceCategory category)
+        {
+            return Json(new { }, JsonRequestBehavior.AllowGet);
+        }
+
     }
 }
