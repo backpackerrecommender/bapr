@@ -1,9 +1,9 @@
-﻿using System;
+﻿using Bapr.Models;
+using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Net.Http;
 using System.Web.Mvc;
-using BaprModels;
-using Bapr.Models;
 
 namespace Bapr.Controllers
 {
@@ -18,7 +18,6 @@ namespace Bapr.Controllers
         private UserPreference GetUserProfile()
         {
             var result = new UserPreference();
-            result.Interests = new List<Interest>();
             result.Interests.Add(new Interest() { Checked = false, Name = "Literature" });
             result.Interests.Add(new Interest() { Checked = false, Name = "History" });
             result.Interests.Add(new Interest() { Checked = false, Name = "Shopping" });
@@ -27,7 +26,6 @@ namespace Bapr.Controllers
             result.Interests.Add(new Interest() { Checked = false, Name = "Cuisine" });
             result.Interests.Add(new Interest() { Checked = false, Name = "Archeology" });
 
-            result.Cuisine = new List<Interest>();
             result.Cuisine.Add(new Interest() { Checked = false, Name = "French" });
             result.Cuisine.Add(new Interest() { Checked = false, Name = "Italian" });
             result.Cuisine.Add(new Interest() { Checked = false, Name = "Asian" });
@@ -48,10 +46,24 @@ namespace Bapr.Controllers
 
 
         [HttpPost]
-        public ActionResult UserPreference(UserPreference userPreferences)
+        public ActionResult UserPreference(UserPreference result)
         {
+            result.Interests.Add(new Interest() { Checked = result.SelectedInterests.Contains("Literature"), Name = "Literature" });
+            result.Interests.Add(new Interest() { Checked = result.SelectedInterests.Contains("History"), Name = "History" });
+            result.Interests.Add(new Interest() { Checked = result.SelectedInterests.Contains("Shopping"), Name = "Shopping" });
+            result.Interests.Add(new Interest() { Checked = result.SelectedInterests.Contains("Dancing"), Name = "Dancing" });
+            result.Interests.Add(new Interest() { Checked = result.SelectedInterests.Contains("Geography"), Name = "Geography" });
+            result.Interests.Add(new Interest() { Checked = result.SelectedInterests.Contains("Cuisine"), Name = "Cuisine" });
+            result.Interests.Add(new Interest() { Checked = result.SelectedInterests.Contains("Archeology"), Name = "Archeology" });
+
+            result.Cuisine.Add(new Interest() { Checked = result.SelectedCuisine.Contains("French"), Name = "French" });
+            result.Cuisine.Add(new Interest() { Checked = result.SelectedCuisine.Contains("Italian"), Name = "Italian" });
+            result.Cuisine.Add(new Interest() { Checked = result.SelectedCuisine.Contains("Asian"), Name = "Asian" });
+            result.Cuisine.Add(new Interest() { Checked = result.SelectedCuisine.Contains("Seefood"), Name = "Seefood" });
+            result.Cuisine.Add(new Interest() { Checked = result.SelectedCuisine.Contains("Indian"), Name = "Indian" });
+
             ViewBag.result = "Data Saved Successfully!";
-            return View(userPreferences);
+            return View(result);
         }
 
         public ActionResult Register()

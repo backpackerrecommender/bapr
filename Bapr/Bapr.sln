@@ -7,8 +7,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Bapr", "Bapr\Bapr.csproj", 
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BaprAPI", "BaprAPI\BaprAPI.csproj", "{725DAAC4-CC93-4E71-8A37-C55401F2254B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BaprModels", "BaprModels\BaprModels.csproj", "{D3ED4A81-73B3-4BAB-8432-0BC6D6BB76AE}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -23,10 +21,6 @@ Global
 		{725DAAC4-CC93-4E71-8A37-C55401F2254B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{725DAAC4-CC93-4E71-8A37-C55401F2254B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{725DAAC4-CC93-4E71-8A37-C55401F2254B}.Release|Any CPU.Build.0 = Release|Any CPU
-		{D3ED4A81-73B3-4BAB-8432-0BC6D6BB76AE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{D3ED4A81-73B3-4BAB-8432-0BC6D6BB76AE}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{D3ED4A81-73B3-4BAB-8432-0BC6D6BB76AE}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{D3ED4A81-73B3-4BAB-8432-0BC6D6BB76AE}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

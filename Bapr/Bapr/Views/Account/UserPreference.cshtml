@@ -1,4 +1,4 @@
-﻿@model BaprModels.UserPreference
+﻿@model Bapr.Models.UserPreference
 
 @{
     ViewBag.Title = "User Preferences";
@@ -9,7 +9,7 @@
 @using (Html.BeginForm())
 {
     @Html.AntiForgeryToken()
-    
+
     <div class="form-horizontal">
 
         @Html.ValidationSummary(true)
@@ -24,7 +24,7 @@
         <div class="form-group">
             @Html.LabelFor(model => model.NoOfDays, new { @class = "control-label col-md-2" })
             <div class="col-md-10">
-                @Html.EditorFor(model => model.NoOfDays, additionalViewData: new { htmlAttributes = new { min = 1, max = Int32.MaxValue, Value =  "3"} })
+                @Html.EditorFor(model => model.NoOfDays, additionalViewData: new { htmlAttributes = new { min = 1, max = Int32.MaxValue, Value = "3" } })
                 @Html.ValidationMessageFor(model => model.NoOfDays)
             </div>
         </div>
@@ -40,28 +40,39 @@
         <div class="form-group">
             @Html.LabelFor(model => model.Interests, new { @class = "control-label col-md-2" })
             <div class="col-md-10">
-                @for (int i = 0; i < Model.Interests.Count; i++)
+                @Html.CheckBoxListFor(x=>x.SelectedInterests, x=>x.Interests, x=>x.Name, x=>x.Name, x=>x.Checked, MvcCheckBoxList.Model.Position.Vertical)
+                @*@for (int i = 0; i < Model.Interests.Count; i++)
                 {
                     <div>
-                        @Html.HiddenFor(x => x.Interests[i].Name)
-                        @Html.CheckBoxFor(x => x.Interests[i].Checked)
-                        @Html.LabelFor(x => x.Interests[i].Checked, Model.Interests[i].Name)
+                        @Html.DisplayFor(x => x.Interests.ElementAt(i).Name, new { })
+                        @Html.CheckBoxFor(x => x.Interests.ElementAt(i).Checked)
+                        @Html.LabelFor(x => x.Interests.ElementAt(i).Checked, Model.Interests.ElementAt(i).Name)
                     </div>
-                }
+                }*@
+                @*@for (int i = 0; i < Model.Interests.Count; i++)
+                    {
+                        <div>
+                            @Html.HiddenFor(x => x.Interests.ElementAt(i).Name)
+                            @Html.CheckBoxFor(x => x.Interests.ElementAt(i).Checked)
+                            @Html.LabelFor(x => x.Interests.ElementAt(i).Checked, Model.Interests.ElementAt(i).Name)
+                        </div>
+                    }*@
             </div>
         </div>
 
         <div class="form-group">
             @Html.LabelFor(model => model.Cuisine, new { @class = "control-label col-md-2" })
             <div class="col-md-10">
-                @for (int i = 0; i < Model.Cuisine.Count; i++)
+                @Html.CheckBoxListFor(x => x.SelectedCuisine, x => x.Interests, x => x.Name, x => x.Name, x => x.Checked, MvcCheckBoxList.Model.Position.Vertical)
+
+                @*@for (int i = 0; i < Model.Cuisine.Count; i++)
                 {
                     <div>
-                        @Html.HiddenFor(x => x.Cuisine[i].Name)
-                        @Html.CheckBoxFor(x => x.Cuisine[i].Checked)
-                        @Html.LabelFor(x => x.Cuisine[i].Checked, Model.Cuisine[i].Name)
+                        @Html.HiddenFor(x => x.Cuisine.ElementAt(i).Name)
+                        @Html.CheckBoxFor(x => x.Cuisine.ElementAt(i).Checked)
+                        @Html.LabelFor(x => x.Cuisine.ElementAt(i).Checked, Model.Cuisine.ElementAt(i).Name)
                     </div>
-                }
+                }*@
             </div>
         </div>
 
