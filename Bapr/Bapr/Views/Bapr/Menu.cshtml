@@ -3,29 +3,33 @@
 @{
     ViewBag.Title = "Menu";
 }
-<div class="btnsSearch">
-    <button id="btnGetFavourites" type="button" class="btn btn-danger btn-lg" data-action="@Url.Action("GetFavouritedPlaces","Bapr")">Favourites</button>
-    <button id="btnGetVisited" type="button" class="btn btn-danger btn-lg" data-action="@Url.Action("GetVisitedPlaces", "Bapr")">Visited</button>
+<div id="tabs">
+    <ul>
+        <li><a href="#search">Search</a></li>
+    </ul>
+    <div id="search">
+        <div class="btnsSearch">
+            <button id="btnGetFavourites" type="button" class="btn btn-danger btn-lg" data-action="@Url.Action("GetFavouritedPlaces", "Bapr")">Favourites</button>
+            <button id="btnGetVisited" type="button" class="btn btn-danger btn-lg" data-action="@Url.Action("GetVisitedPlaces", "Bapr")">Visited</button>
+        </div>
+        <br />
+        <div id="searchTextFree">
+            <input id="userSearchText" type="text" placeholder="Search">
+            <input id="getPlacesByTextBtn" type="button" value="Search" data-action="@Url.Action("GetPlacesByText", "Bapr")">
+        </div>
+        <br />
+
+        <select class="form-control searchCategory" id="placeCategory" data-action="@Url.Action("GetPlacesByCategory", "Bapr")">
+            <option value="Empty">Select a category</option>
+            <option value="Restaurants">Restaurants</option>
+            <option value="Museums">Museums</option>
+            <option value="Hotels">Hotels</option>
+            <option value="Hospitals">Hospitals</option>
+
+        </select>
+    </div>
 </div>
-
-<div id="searchTextFree">
-    <input id="userSearchText" type="text" placeholder="Search">
-    <input id="getPlacesByTextBtn" type="button" value="Search" data-action ="@Url.Action("GetPlacesByText","Bapr")" >
-</div>
-
-<div>
-
-    <select class="form-control searchCategory" id="placeCategory" data-action="@Url.Action("GetPlacesByCategory","Bapr")">
-        <option value="Empty">Select a category</option>
-        <option value="Restaurants">Restaurants</option>
-        <option value="Museums">Museums</option>
-        <option value="Hotels">Hotels</option>
-        <option value="Hospitals">Hospitals</option>
-
-    </select>
-</div>
-
-    <div id="map"></div>
+<div id="map"></div>
 
 
 <script async defer

@@ -62,28 +62,19 @@ body,html
     position: absolute;
    
     }
-.btnsSearch {
-     position: absolute;
-      top:12%;
-      left: 2%;
-   
-}
-
-#searchTextFree {
-      position: absolute;
-      top:20%;
-      left: 2%;
-}
 
 #getPlacesByTextBtn {
         /*background-image: url('../Content/images/magnifier.jpg');
                background-repeat: no-repeat;
        background-position: center;*/
-float: right;
 }
 .searchCategory{
-top: 26%;
-width: 13%;
-position: absolute;
-left: 2%;
+width: 73%;
+}
+#tabs
+{
+   position:fixed;
+   overflow:auto;
+   top:15%;
+   left:2%;
 }

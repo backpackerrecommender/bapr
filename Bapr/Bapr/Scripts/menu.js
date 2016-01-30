@@ -3,9 +3,10 @@
         var latLng = { lat: latitude, lng: longitude };
 
         var map = new google.maps.Map(document.getElementById('map'), {
-            zoom: 4,
+            zoom: 10,
             center: latLng
         });
+
 
         var marker = new google.maps.Marker({
             position: latLng,
@@ -14,7 +15,8 @@
         });
     }
 
-$(document).ready(function () {
+    $(document).ready(function () {
+           $("#tabs").tabs();
     $('#btnGetFavourites').click(function() {
         var url = $(this).data('action');
         $.get(url, function(data) {
