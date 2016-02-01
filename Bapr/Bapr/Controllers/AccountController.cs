@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Web.Mvc;
 
 namespace Bapr.Controllers
@@ -18,6 +19,7 @@ namespace Bapr.Controllers
         private UserPreference GetUserProfile()
         {
             var result = new UserPreference();
+            result.Interests = new Collection<Interest>();
             result.Interests.Add(new Interest() { Checked = false, Name = "Literature" });
             result.Interests.Add(new Interest() { Checked = false, Name = "History" });
             result.Interests.Add(new Interest() { Checked = false, Name = "Shopping" });
@@ -26,10 +28,11 @@ namespace Bapr.Controllers
             result.Interests.Add(new Interest() { Checked = false, Name = "Cuisine" });
             result.Interests.Add(new Interest() { Checked = false, Name = "Archeology" });
 
+            result.Cuisine = new Collection<Interest>();
             result.Cuisine.Add(new Interest() { Checked = false, Name = "French" });
             result.Cuisine.Add(new Interest() { Checked = false, Name = "Italian" });
             result.Cuisine.Add(new Interest() { Checked = false, Name = "Asian" });
-            result.Cuisine.Add(new Interest() { Checked = false, Name = "Seefood" });
+            result.Cuisine.Add(new Interest() { Checked = false, Name = "Seafood" });
             result.Cuisine.Add(new Interest() { Checked = false, Name = "Indian" });
 
             return result;
@@ -48,6 +51,8 @@ namespace Bapr.Controllers
         [HttpPost]
         public ActionResult UserPreference(UserPreference result)
         {
+            result.Interests = new Collection<Interest>();
+            result.SelectedInterests = result.SelectedInterests != null ? result.SelectedInterests : new Collection<string>();
             result.Interests.Add(new Interest() { Checked = result.SelectedInterests.Contains("Literature"), Name = "Literature" });
             result.Interests.Add(new Interest() { Checked = result.SelectedInterests.Contains("History"), Name = "History" });
             result.Interests.Add(new Interest() { Checked = result.SelectedInterests.Contains("Shopping"), Name = "Shopping" });
@@ -56,10 +61,12 @@ namespace Bapr.Controllers
             result.Interests.Add(new Interest() { Checked = result.SelectedInterests.Contains("Cuisine"), Name = "Cuisine" });
             result.Interests.Add(new Interest() { Checked = result.SelectedInterests.Contains("Archeology"), Name = "Archeology" });
 
+            result.Cuisine = new Collection<Interest>();
+            result.SelectedCuisine = result.SelectedCuisine != null ? result.SelectedCuisine : new Collection<string>();
             result.Cuisine.Add(new Interest() { Checked = result.SelectedCuisine.Contains("French"), Name = "French" });
             result.Cuisine.Add(new Interest() { Checked = result.SelectedCuisine.Contains("Italian"), Name = "Italian" });
             result.Cuisine.Add(new Interest() { Checked = result.SelectedCuisine.Contains("Asian"), Name = "Asian" });
-            result.Cuisine.Add(new Interest() { Checked = result.SelectedCuisine.Contains("Seefood"), Name = "Seefood" });
+            result.Cuisine.Add(new Interest() { Checked = result.SelectedCuisine.Contains("Seafood"), Name = "Seafood" });
             result.Cuisine.Add(new Interest() { Checked = result.SelectedCuisine.Contains("Indian"), Name = "Indian" });
 
             ViewBag.result = "Data Saved Successfully!";
@@ -68,41 +75,28 @@ namespace Bapr.Controllers
 
         public ActionResult Register()
         {
-            //var result = new UserAccount();
-            //string baseUri = "http://localhost:1256/api/authapi/5";
-
-            //using (var client = new HttpClient())
-            //{
-
-            //    var response = client.GetAsync(baseUri).Result;
-            //    if (response.IsSuccessStatusCode)
-            //    {
-            //        result = JsonConvert.DeserializeObject<UserAccount>(response.Content.ReadAsStringAsync().Result);
-
-            //    }
-            //}
             return View();
         }
         [HttpPost]
         public ActionResult Register(Register model)
         {
-            //string baseUri = "http://localhost:1256/api/authapi";
-
-            //using (var client = new HttpClient())
-            //{
-
-            //    var response = client.PostAsync(baseUri, user, new JsonMediaTypeFormatter()).Result;
-            //    if (response.IsSuccessStatusCode)
-            //    {
-            //        var result = response.Content.ReadAsAsync<int>().Result;
-            //        Console.WriteLine("Performance instance successfully sent to the API");
-            //    }
-            //}
-            if (ModelState.IsValid)
+            if (!ModelState.IsValid)
             {
-                return RedirectToAction("Index", "Bapr");
+                return View(model);
             }
-            return View(model);
+            HttpClient client = new HttpClient();
+            client.BaseAddress = new Uri("http://localhost:18323/api/LogIn/Register");
+            client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+            string urlParameters = "?email=" + model.Email + "&password=" + EncryptPassword(model.Password);
+
+            HttpContent content = new StringContent("");
+            HttpResponseMessage response = client.PostAsync(urlParameters, content).Result;
+            if (response.IsSuccessStatusCode)
+            {
+                return RedirectToAction("Login", "Account");
+            }
+
+            return RedirectToAction("Register", "Account");
         }
 
         public ActionResult Login()
@@ -113,17 +107,37 @@ namespace Bapr.Controllers
         [HttpPost]
         public ActionResult Login(Login userModel)
         {
-            if (ModelState.IsValid)
+            if (!ModelState.IsValid)
             {
+                return View(userModel);
+            }
+            HttpClient client = new HttpClient();
+            client.BaseAddress = new Uri("http://localhost:18323/api/LogIn/LogIn");
+            client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+            string urlParameters = "?email=" + userModel.Email + "&password=" + EncryptPassword(userModel.Password);
+
+            HttpContent content = new StringContent("");
+            HttpResponseMessage response = client.PostAsync(urlParameters, content).Result;
+            if (response.IsSuccessStatusCode)
+            {
+                Session["logged_username"] = userModel.Email;
                 return RedirectToAction("Index", "Bapr");
             }
-            return View(userModel);
+
+            return RedirectToAction("Login", "Account");
         }
 
-        [HttpPost]
         public ActionResult LogOut()
         {
+            Session["logged_username"] = "";
             return RedirectToAction("Index", "Home");
+        }
+
+        private string EncryptPassword(string password)
+        {
+            byte[] data = System.Text.Encoding.ASCII.GetBytes(password);
+            data = new System.Security.Cryptography.SHA256Managed().ComputeHash(data);
+            return System.Text.Encoding.ASCII.GetString(data);
         }
     }
 }

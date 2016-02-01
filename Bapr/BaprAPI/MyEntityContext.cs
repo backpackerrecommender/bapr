@@ -37,6 +37,8 @@ namespace BaprAPI
         public static void InitializeEntityMappingStore()
         {
     		var provider = new ReflectionMappingProvider();
+    		provider.AddMappingsForType(EntityMappingStore.Instance, typeof(BaprAPI.Models.IUser));
+    		EntityMappingStore.Instance.SetImplMapping<BaprAPI.Models.IUser, BaprAPI.Models.User>();
     		provider.AddMappingsForType(EntityMappingStore.Instance, typeof(BaprAPI.Models.IInterest));
     		EntityMappingStore.Instance.SetImplMapping<BaprAPI.Models.IInterest, BaprAPI.Models.Interest>();
     		provider.AddMappingsForType(EntityMappingStore.Instance, typeof(BaprAPI.Models.IUserPreference));
@@ -106,8 +108,14 @@ namespace BaprAPI
     	
     	private void InitializeContext() 
     	{
+    		Users = 	new BrightstarEntitySet<BaprAPI.Models.IUser>(this);
     		Interests = 	new BrightstarEntitySet<BaprAPI.Models.IInterest>(this);
     		UserPreferences = 	new BrightstarEntitySet<BaprAPI.Models.IUserPreference>(this);
+    	}
+    	
+    	public IEntitySet<BaprAPI.Models.IUser> Users
+    	{
+    		get; private set;
     	}
     	
     	public IEntitySet<BaprAPI.Models.IInterest> Interests
@@ -122,6 +130,9 @@ namespace BaprAPI
     	
         public IEntitySet<T> EntitySet<T>() where T : class {
             var itemType = typeof(T);
+            if (typeof(T).Equals(typeof(BaprAPI.Models.IUser))) {
+                return (IEntitySet<T>)this.Users;
+            }
             if (typeof(T).Equals(typeof(BaprAPI.Models.IInterest))) {
                 return (IEntitySet<T>)this.Interests;
             }
@@ -133,6 +144,36 @@ namespace BaprAPI
     
         } // end class MyEntityContext
         
+}
+namespace BaprAPI.Models 
+{
+    
+    public partial class User : BrightstarEntityObject, IUser 
+    {
+    	public User(BrightstarEntityContext context, BrightstarDB.Client.IDataObject dataObject) : base(context, dataObject) { }
+        public User(BrightstarEntityContext context) : base(context, typeof(User)) { }
+    	public User() : base() { }
+    	#region Implementation of BaprAPI.Models.IUser
+    
+    	public System.String Email
+    	{
+            		get { return GetRelatedProperty<System.String>("Email"); }
+            		set { SetRelatedProperty("Email", value); }
+    	}
+    
+    	public System.String Password
+    	{
+            		get { return GetRelatedProperty<System.String>("Password"); }
+            		set { SetRelatedProperty("Password", value); }
+    	}
+    
+    	public BaprAPI.Models.IUserPreference UserPreference
+    	{
+            get { return GetRelatedObject<BaprAPI.Models.IUserPreference>("UserPreference"); }
+            set { SetRelatedObject<BaprAPI.Models.IUserPreference>("UserPreference", value); }
+    	}
+    	#endregion
+    }
 }
 namespace BaprAPI.Models 
 {

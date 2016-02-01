@@ -6,6 +6,7 @@ using System.Web;
 
 namespace BaprAPI.Models
 {
+    [Entity]
     public interface IUser
     {
         string Email { get; set; }

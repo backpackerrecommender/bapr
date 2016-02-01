@@ -6,32 +6,30 @@ using System.Web;
 
 namespace Bapr.Models
 {
-    public interface IUser
+    public class User
     {
-        string Email { get; set; }
+        public string Email { get; set; }
 
-        string Password { get; set; }
+        public string Password { get; set; }
 
-        IUserPreference UserPreference { get; set; }
+        public UserPreference UserPreference { get; set; }
     }
 
-    [Entity]
-    public interface IInterest
+    public class Interest
     {
-        string Name { get; set; }
-        bool Checked { get; set; }
+        public string Name { get; set; }
+        public bool Checked { get; set; }
     }
 
-    [Entity]
-    public interface IUserPreference
+    public class UserPreference
     {
-        long MaxBudget { get; set; }
-        int NoOfDays { get; set; }
-        bool NeedMedicalSupport { get; set; }
-        ICollection<IInterest> Interests { get; set; }
-        ICollection<IInterest> Cuisine { get; set; }
-        ICollection<string> SelectedInterests { get; set; }
-        ICollection<string> SelectedCuisine { get; set; }
+        public long MaxBudget { get; set; }
+        public int NoOfDays { get; set; }
+        public bool NeedMedicalSupport { get; set; }
+        public ICollection<Interest> Interests { get; set; }
+        public ICollection<Interest> Cuisine { get; set; }
+        public ICollection<string> SelectedInterests { get; set; }
+        public ICollection<string> SelectedCuisine { get; set; }
 
     }
 
