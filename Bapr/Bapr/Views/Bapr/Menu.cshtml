@@ -3,6 +3,7 @@
 @{
     ViewBag.Title = "Menu";
 }
+
 <div id="tabs">
     <ul>
         <li><a href="#search">Search</a></li>
@@ -21,16 +22,20 @@
 
         <select class="form-control searchCategory" id="placeCategory" data-action="@Url.Action("GetPlacesByCategory", "Bapr")">
             <option value="Empty">Select a category</option>
-            <option value="Restaurants">Restaurants</option>
-            <option value="Museums">Museums</option>
-            <option value="Hotels">Hotels</option>
-            <option value="Hospitals">Hospitals</option>
+            <option value="Restaurants" itemscope itemtype="https://schema.org/Restaurant">Restaurants</option>
+            <option value="Museums" itemscope itemtype="https://schema.org/Museum">Museums</option>
+            <option value="Hotels" itemscope itemtype="https://schema.org/Hotel">Hotels</option>
+            <option value="Hospitals" itemscope itemtype="https://schema.org/Hospital">Hospitals</option>
 
         </select>
     </div>
 </div>
 <div id="map"></div>
 
+<div hidden class="geo" id="#userCoordinates">
+    <abbr class="latitude" hidden title="@Model.latitude"></abbr>
+    <abbr class="longitude" hidden title="@Model.longitude"></abbr>
+</div>
 
 <script async defer
         src="https://maps.googleapis.com/maps/api/js?key=AIzaSyD0D3HknFGgJKip1hbsPjP6SGcoYcFGnfY&signed_in=true&callback=startMap"></script>
