@@ -5,7 +5,8 @@
 <ul id="login" class="nav navbar-nav navbar-right">
     @if (Session["logged_username"] != null && !Session["logged_username"].ToString().Equals(""))
     {
-        <li>@Html.ActionLink("Hello " + @Session["logged_username"].ToString() + " !", "ChangePassword", "Account")</li>
+        <li>@Html.ActionLink("Hello " + @Session["logged_username"].ToString() + " !", "Login", "Account")</li>
+        <li>@Html.ActionLink("User Preference", "UserPreference", "Account")</li>
         <li>@Html.ActionLink("Log Out", "LogOut", "Account")</li>
     }
     else
