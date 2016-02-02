@@ -33,11 +33,11 @@ namespace Bapr.Controllers
         {
             return Json(new { }, JsonRequestBehavior.AllowGet);
         }
-        public ActionResult GetPlacesByText(string text)
+        public ActionResult GetPlacesByText(string text, string latitude, string longitude)
         {
             return Json(text, JsonRequestBehavior.AllowGet);
         }
-        public ActionResult GetPlacesByCategory(PlaceCategory category)
+        public ActionResult GetPlacesByCategory(PlaceCategory category, string latitude, string longitude)
         {
             return Json(new { }, JsonRequestBehavior.AllowGet);
         }

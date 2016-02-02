@@ -32,8 +32,10 @@
     $('#getPlacesByTextBtn').click(function () {
         var url = $(this).data('action');
         var text = $('#userSearchText').val();
+        var latitude = $('.latitude').attr('title');
+        var longitude = $('.longitude').attr('title');
         if (text != null && text != " ") {
-            $.get(url, { text: text }, function(data) {
+            $.get(url, { text: text, latitude:latitude, longitude:longitude }, function(data) {
                 alert(data);
             });
         }
@@ -42,8 +44,10 @@
     $('#placeCategory').change(function() {
         var selectedValue = $(this).val();
         var url = $(this).data('action');
+        var latitude = $('.latitude').attr('title');
+        var longitude = $('.longitude').attr('title');
         if (selectedValue != "Empty") {
-            $.get(url, { category: selectedValue }, function(data) {
+            $.get(url, { category: selectedValue, latitude: latitude, longitude: longitude }, function (data) {
 
             });
         }
