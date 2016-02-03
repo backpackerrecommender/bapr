@@ -36,12 +36,12 @@
     <abbr class="latitude" hidden title="@Model.latitude"></abbr>
     <abbr class="longitude" hidden title="@Model.longitude"></abbr>
 </div>
-
-<script async defer
-        src="https://maps.googleapis.com/maps/api/js?key=AIzaSyD0D3HknFGgJKip1hbsPjP6SGcoYcFGnfY&signed_in=true&callback=startMap"></script>
 <script>
     function startMap() {
         initMap(@Model.latitude, @Model.longitude);
     }
 
 </script>
+<script async defer
+        src="https://maps.googleapis.com/maps/api/js?key=AIzaSyD0D3HknFGgJKip1hbsPjP6SGcoYcFGnfY&signed_in=true&callback=startMap"></script>
+
