@@ -30,7 +30,6 @@ C:\Users\Oana\bapr\Bapr\Bapr\bin\Bapr.dll.config
 C:\Users\Oana\bapr\Bapr\Bapr\bin\Bapr.dll
 C:\Users\Oana\bapr\Bapr\Bapr\bin\Bapr.pdb
 C:\Users\Oana\bapr\Bapr\Bapr\bin\Antlr3.Runtime.dll
-C:\Users\Oana\bapr\Bapr\Bapr\bin\BaprModels.dll
 C:\Users\Oana\bapr\Bapr\Bapr\bin\Microsoft.Web.Infrastructure.dll
 C:\Users\Oana\bapr\Bapr\Bapr\bin\Newtonsoft.Json.dll
 C:\Users\Oana\bapr\Bapr\Bapr\bin\System.Web.Helpers.dll
@@ -41,7 +40,6 @@ C:\Users\Oana\bapr\Bapr\Bapr\bin\System.Web.WebPages.Deployment.dll
 C:\Users\Oana\bapr\Bapr\Bapr\bin\System.Web.WebPages.dll
 C:\Users\Oana\bapr\Bapr\Bapr\bin\System.Web.WebPages.Razor.dll
 C:\Users\Oana\bapr\Bapr\Bapr\bin\WebGrease.dll
-C:\Users\Oana\bapr\Bapr\Bapr\bin\BaprModels.pdb
 C:\Users\Oana\bapr\Bapr\Bapr\bin\System.Web.Helpers.xml
 C:\Users\Oana\bapr\Bapr\Bapr\bin\System.Web.Mvc.xml
 C:\Users\Oana\bapr\Bapr\Bapr\bin\System.Web.Optimization.xml
@@ -51,6 +49,17 @@ C:\Users\Oana\bapr\Bapr\Bapr\bin\System.Web.WebPages.Deployment.xml
 C:\Users\Oana\bapr\Bapr\Bapr\bin\System.Web.WebPages.Razor.xml
 C:\Users\Oana\bapr\Bapr\Bapr\bin\Antlr3.Runtime.pdb
 C:\Users\Oana\bapr\Bapr\Bapr\bin\Newtonsoft.Json.xml
-C:\Users\Oana\bapr\Bapr\Bapr\obj\Debug\Bapr.csprojResolveAssemblyReference.cache
 C:\Users\Oana\bapr\Bapr\Bapr\obj\Debug\Bapr.dll
 C:\Users\Oana\bapr\Bapr\Bapr\obj\Debug\Bapr.pdb
+C:\Users\Oana\bapr\Bapr\Bapr\bin\BrightstarDB.dll
+C:\Users\Oana\bapr\Bapr\Bapr\bin\dotNetRDF.dll
+C:\Users\Oana\bapr\Bapr\Bapr\bin\HtmlAgilityPack.dll
+C:\Users\Oana\bapr\Bapr\Bapr\bin\MvcCheckBoxList.dll
+C:\Users\Oana\bapr\Bapr\Bapr\bin\Remotion.Linq.dll
+C:\Users\Oana\bapr\Bapr\Bapr\bin\VDS.Common.dll
+C:\Users\Oana\bapr\Bapr\Bapr\bin\dotNetRDF.pdb
+C:\Users\Oana\bapr\Bapr\Bapr\bin\dotNetRDF.xml
+C:\Users\Oana\bapr\Bapr\Bapr\bin\HtmlAgilityPack.pdb
+C:\Users\Oana\bapr\Bapr\Bapr\bin\HtmlAgilityPack.xml
+C:\Users\Oana\bapr\Bapr\Bapr\bin\VDS.Common.pdb
+C:\Users\Oana\bapr\Bapr\Bapr\bin\VDS.Common.xml
