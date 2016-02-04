@@ -61,7 +61,14 @@ body,html
     top:10%;
     position: absolute;
    
-    }
+}
+
+#locationDetails {
+    float: left;
+    width: 100%;
+    overflow-x: auto;
+    height: 200px;
+}
 
 #getPlacesByTextBtn {
         /*background-image: url('../Content/images/magnifier.jpg');

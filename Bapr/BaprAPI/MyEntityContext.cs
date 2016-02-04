@@ -14,6 +14,7 @@ using System.Linq;
 using BrightstarDB.Client;
 using BrightstarDB.EntityFramework;
 
+using System.Collections;
 using System.Web;
 
 namespace BaprAPI 
@@ -37,6 +38,10 @@ namespace BaprAPI
         public static void InitializeEntityMappingStore()
         {
     		var provider = new ReflectionMappingProvider();
+    		provider.AddMappingsForType(EntityMappingStore.Instance, typeof(BaprAPI.Models.ILocation));
+    		EntityMappingStore.Instance.SetImplMapping<BaprAPI.Models.ILocation, BaprAPI.Models.Location>();
+    		provider.AddMappingsForType(EntityMappingStore.Instance, typeof(BaprAPI.Models.IAttribute));
+    		EntityMappingStore.Instance.SetImplMapping<BaprAPI.Models.IAttribute, BaprAPI.Models.Attribute>();
     		provider.AddMappingsForType(EntityMappingStore.Instance, typeof(BaprAPI.Models.IUser));
     		EntityMappingStore.Instance.SetImplMapping<BaprAPI.Models.IUser, BaprAPI.Models.User>();
     		provider.AddMappingsForType(EntityMappingStore.Instance, typeof(BaprAPI.Models.IInterest));
@@ -108,9 +113,21 @@ namespace BaprAPI
     	
     	private void InitializeContext() 
     	{
+    		Locations = 	new BrightstarEntitySet<BaprAPI.Models.ILocation>(this);
+    		Attributes = 	new BrightstarEntitySet<BaprAPI.Models.IAttribute>(this);
     		Users = 	new BrightstarEntitySet<BaprAPI.Models.IUser>(this);
     		Interests = 	new BrightstarEntitySet<BaprAPI.Models.IInterest>(this);
     		UserPreferences = 	new BrightstarEntitySet<BaprAPI.Models.IUserPreference>(this);
+    	}
+    	
+    	public IEntitySet<BaprAPI.Models.ILocation> Locations
+    	{
+    		get; private set;
+    	}
+    	
+    	public IEntitySet<BaprAPI.Models.IAttribute> Attributes
+    	{
+    		get; private set;
     	}
     	
     	public IEntitySet<BaprAPI.Models.IUser> Users
@@ -130,6 +147,12 @@ namespace BaprAPI
     	
         public IEntitySet<T> EntitySet<T>() where T : class {
             var itemType = typeof(T);
+            if (typeof(T).Equals(typeof(BaprAPI.Models.ILocation))) {
+                return (IEntitySet<T>)this.Locations;
+            }
+            if (typeof(T).Equals(typeof(BaprAPI.Models.IAttribute))) {
+                return (IEntitySet<T>)this.Attributes;
+            }
             if (typeof(T).Equals(typeof(BaprAPI.Models.IUser))) {
                 return (IEntitySet<T>)this.Users;
             }
@@ -144,6 +167,71 @@ namespace BaprAPI
     
         } // end class MyEntityContext
         
+}
+namespace BaprAPI.Models 
+{
+    
+    public partial class Location : BrightstarEntityObject, ILocation 
+    {
+    	public Location(BrightstarEntityContext context, BrightstarDB.Client.IDataObject dataObject) : base(context, dataObject) { }
+        public Location(BrightstarEntityContext context) : base(context, typeof(Location)) { }
+    	public Location() : base() { }
+    	#region Implementation of BaprAPI.Models.ILocation
+    
+    	public System.Double latitude
+    	{
+            		get { return GetRelatedProperty<System.Double>("latitude"); }
+            		set { SetRelatedProperty("latitude", value); }
+    	}
+    
+    	public System.Double longitude
+    	{
+            		get { return GetRelatedProperty<System.Double>("longitude"); }
+            		set { SetRelatedProperty("longitude", value); }
+    	}
+    
+    	public System.String name
+    	{
+            		get { return GetRelatedProperty<System.String>("name"); }
+            		set { SetRelatedProperty("name", value); }
+    	}
+    	public System.Collections.Generic.ICollection<BaprAPI.Models.IAttribute> attributes
+    	{
+    		get { return GetRelatedObjects<BaprAPI.Models.IAttribute>("attributes"); }
+    		set { if (value == null) throw new ArgumentNullException("value"); SetRelatedObjects("attributes", value); }
+    								}
+    	#endregion
+    }
+}
+namespace BaprAPI.Models 
+{
+    
+    public partial class Attribute : BrightstarEntityObject, IAttribute 
+    {
+    	public Attribute(BrightstarEntityContext context, BrightstarDB.Client.IDataObject dataObject) : base(context, dataObject) { }
+        public Attribute(BrightstarEntityContext context) : base(context, typeof(Attribute)) { }
+    	public Attribute() : base() { }
+    	#region Implementation of BaprAPI.Models.IAttribute
+    
+    	public System.String Name
+    	{
+            		get { return GetRelatedProperty<System.String>("Name"); }
+            		set { SetRelatedProperty("Name", value); }
+    	}
+    
+    	public System.String Value
+    	{
+            		get { return GetRelatedProperty<System.String>("Value"); }
+            		set { SetRelatedProperty("Value", value); }
+    	}
+    
+    	public System.String Type
+    	{
+            		get { return GetRelatedProperty<System.String>("Type"); }
+            		set { SetRelatedProperty("Type", value); }
+    	}
+    	#endregion
+    }
 }
 namespace BaprAPI.Models 
 {
