@@ -23,20 +23,21 @@ namespace Bapr.Controllers
         {
             var result = new UserPreference();
             result.Interests = new Collection<Interest>();
-            result.Interests.Add(new Interest() { Checked = false, Name = "Literature" });
-            result.Interests.Add(new Interest() { Checked = false, Name = "History" });
-            result.Interests.Add(new Interest() { Checked = false, Name = "Shopping" });
+            result.Interests.Add(new Interest() { Checked = false, Name = "Archeology" });
+            result.Interests.Add(new Interest() { Checked = false, Name = "Cuisine" });
             result.Interests.Add(new Interest() { Checked = false, Name = "Dancing" });
             result.Interests.Add(new Interest() { Checked = false, Name = "Geography" });
-            result.Interests.Add(new Interest() { Checked = false, Name = "Cuisine" });
-            result.Interests.Add(new Interest() { Checked = false, Name = "Archeology" });
+            result.Interests.Add(new Interest() { Checked = false, Name = "History" });
+            result.Interests.Add(new Interest() { Checked = false, Name = "Literature" });
+            result.Interests.Add(new Interest() { Checked = false, Name = "Shopping" });
 
             result.Cuisine = new Collection<Interest>();
-            result.Cuisine.Add(new Interest() { Checked = false, Name = "French" });
-            result.Cuisine.Add(new Interest() { Checked = false, Name = "Italian" });
             result.Cuisine.Add(new Interest() { Checked = false, Name = "Asian" });
-            result.Cuisine.Add(new Interest() { Checked = false, Name = "Seafood" });
+            result.Cuisine.Add(new Interest() { Checked = false, Name = "French" });
             result.Cuisine.Add(new Interest() { Checked = false, Name = "Indian" });
+            result.Cuisine.Add(new Interest() { Checked = false, Name = "Italian" });
+            result.Cuisine.Add(new Interest() { Checked = false, Name = "Seafood" });
+
 
             return result;
         }
@@ -60,9 +61,35 @@ namespace Bapr.Controllers
         // GET: /Auth/
         public ActionResult UserPreference()
         {
-            var result = GetUserProfile();
+            
+            HttpResponseMessage response = null;
+            UserPreference userPreferences = null;
+            string user = string.Empty;
 
-            return View(result);
+            if (Session != null)
+                user = Session["logged_username"].ToString();
+            else
+                return View(GetUserProfile());
+
+            using (var client = new HttpClient())
+            {
+                client.BaseAddress = new Uri("http://localhost:18323/api/UserPreference/GetUserPreference");
+                client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+
+                string urlParameters = "?user=" + user;
+
+                response = client.GetAsync(urlParameters).Result;
+                var result = response.Content.ReadAsStringAsync().Result;
+
+                //parse json result
+                var jsonString = new JavaScriptSerializer().Deserialize<string>(result);
+                userPreferences = new JavaScriptSerializer().Deserialize<UserPreference>(jsonString);
+            }
+            if (response.IsSuccessStatusCode && userPreferences != null)
+                return View(userPreferences);
+            else
+                return View(GetUserProfile());
+
         }
 
 
@@ -71,21 +98,25 @@ namespace Bapr.Controllers
         {
             result.Interests = new Collection<Interest>();
             result.SelectedInterests = result.SelectedInterests != null ? result.SelectedInterests : new Collection<string>();
-            result.Interests.Add(new Interest() { Checked = result.SelectedInterests.Contains("Literature"), Name = "Literature" });
-            result.Interests.Add(new Interest() { Checked = result.SelectedInterests.Contains("History"), Name = "History" });
-            result.Interests.Add(new Interest() { Checked = result.SelectedInterests.Contains("Shopping"), Name = "Shopping" });
+            result.Interests.Add(new Interest() { Checked = result.SelectedInterests.Contains("Archeology"), Name = "Archeology" });
+            result.Interests.Add(new Interest() { Checked = result.SelectedInterests.Contains("Cuisine"), Name = "Cuisine" });
             result.Interests.Add(new Interest() { Checked = result.SelectedInterests.Contains("Dancing"), Name = "Dancing" });
             result.Interests.Add(new Interest() { Checked = result.SelectedInterests.Contains("Geography"), Name = "Geography" });
-            result.Interests.Add(new Interest() { Checked = result.SelectedInterests.Contains("Cuisine"), Name = "Cuisine" });
-            result.Interests.Add(new Interest() { Checked = result.SelectedInterests.Contains("Archeology"), Name = "Archeology" });
+            result.Interests.Add(new Interest() { Checked = result.SelectedInterests.Contains("History"), Name = "History" });
+            result.Interests.Add(new Interest() { Checked = result.SelectedInterests.Contains("Literature"), Name = "Literature" });
+            result.Interests.Add(new Interest() { Checked = result.SelectedInterests.Contains("Shopping"), Name = "Shopping" });
+           
+
+           
 
             result.Cuisine = new Collection<Interest>();
             result.SelectedCuisine = result.SelectedCuisine != null ? result.SelectedCuisine : new Collection<string>();
-            result.Cuisine.Add(new Interest() { Checked = result.SelectedCuisine.Contains("French"), Name = "French" });
-            result.Cuisine.Add(new Interest() { Checked = result.SelectedCuisine.Contains("Italian"), Name = "Italian" });
             result.Cuisine.Add(new Interest() { Checked = result.SelectedCuisine.Contains("Asian"), Name = "Asian" });
-            result.Cuisine.Add(new Interest() { Checked = result.SelectedCuisine.Contains("Seafood"), Name = "Seafood" });
+            result.Cuisine.Add(new Interest() { Checked = result.SelectedCuisine.Contains("French"), Name = "French" });
             result.Cuisine.Add(new Interest() { Checked = result.SelectedCuisine.Contains("Indian"), Name = "Indian" });
+            result.Cuisine.Add(new Interest() { Checked = result.SelectedCuisine.Contains("Italian"), Name = "Italian" });
+            result.Cuisine.Add(new Interest() { Checked = result.SelectedCuisine.Contains("Seafood"), Name = "Seafood" });
+
 
             HttpResponseMessage response = SaveUserPreferences(result, Session["logged_username"].ToString());
             if (response.IsSuccessStatusCode)
