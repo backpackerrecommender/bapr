@@ -1,10 +1,13 @@
 ﻿using Bapr.Models;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Net.Http;
 using System.Net.Http.Headers;
+using System.Text;
 using System.Web.Mvc;
+using System.Web.Script.Serialization;
 
 namespace Bapr.Controllers
 {
@@ -38,6 +41,21 @@ namespace Bapr.Controllers
             return result;
         }
 
+        private HttpResponseMessage SaveUserPreferences(UserPreference preferences, string user)
+        {
+            HttpClient client = new HttpClient();
+            client.BaseAddress = new Uri("http://localhost:18323/api/UserPreference/SaveUserPreference");
+            client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+
+            var json = new JavaScriptSerializer().Serialize(preferences);
+            string urlParameters = "?user=" + user + "&preferences=" + json.ToString();
+           
+            HttpContent content = new StringContent("");
+            HttpResponseMessage response = client.PostAsync(urlParameters, content).Result;
+            
+            return response;
+        }
+
         //
         // GET: /Auth/
         public ActionResult UserPreference()
@@ -69,7 +87,11 @@ namespace Bapr.Controllers
             result.Cuisine.Add(new Interest() { Checked = result.SelectedCuisine.Contains("Seafood"), Name = "Seafood" });
             result.Cuisine.Add(new Interest() { Checked = result.SelectedCuisine.Contains("Indian"), Name = "Indian" });
 
-            ViewBag.result = "Data Saved Successfully!";
+            HttpResponseMessage response = SaveUserPreferences(result, Session["logged_username"].ToString());
+            if (response.IsSuccessStatusCode)
+            {
+                ViewBag.result = "Data Saved Successfully!";
+            }
             return View(result);
         }
 

@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
+using System.Web.Script.Serialization;
 
 namespace Bapr.Models
 {
@@ -28,7 +29,9 @@ namespace Bapr.Models
         public bool NeedMedicalSupport { get; set; }
         public ICollection<Interest> Interests { get; set; }
         public ICollection<Interest> Cuisine { get; set; }
+        [ScriptIgnore()]
         public ICollection<string> SelectedInterests { get; set; }
+        [ScriptIgnore()]
         public ICollection<string> SelectedCuisine { get; set; }
 
     }
