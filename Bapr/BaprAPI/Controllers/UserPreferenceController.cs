@@ -18,7 +18,7 @@ namespace BaprAPI.Controllers
         [ActionName("SaveUserPreference")]
         public HttpResponseMessage SaveUserPreference(string user, string preferences)
         {
-            string connectionString = "type=embedded;storesdirectory=" + "D:\\brightstar" + ";storename=Users";
+            string connectionString = Constants.storeConnectionString;
             var client = BrightstarService.GetClient(connectionString);
             UserPreferenceModel userPreferencesModel =
                 new JavaScriptSerializer().Deserialize<UserPreferenceModel>(preferences);

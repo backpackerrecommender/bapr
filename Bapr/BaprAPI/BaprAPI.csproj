@@ -98,15 +98,17 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="App_Start\WebApiConfig.cs" />
+    <Compile Include="Controllers\MarkedLocationsController.cs" />
     <Compile Include="Controllers\HospitalsController.cs" />
     <Compile Include="Controllers\LogInController.cs" />
-	<Compile Include="Controllers\UserPreferenceController.cs" />
+    <Compile Include="Controllers\UserPreferenceController.cs" />
     <Compile Include="Controllers\SearchController.cs" />
     <Compile Include="Controllers\ShopsController.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
-	<Compile Include="Models\Location.cs" />
+    <Compile Include="Models\Constants.cs" />
+    <Compile Include="Models\Location.cs" />
     <Compile Include="Models\User.cs" />
     <Compile Include="Models\UserPreference.cs" />
     <Compile Include="MyEntityContext.cs">

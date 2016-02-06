@@ -14,7 +14,11 @@ using System.Linq;
 using BrightstarDB.Client;
 using BrightstarDB.EntityFramework;
 
+using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
+using Newtonsoft.Json.Linq;
 using System.Collections;
+using System.Collections.ObjectModel;
 using System.Web;
 
 namespace BaprAPI 
@@ -40,8 +44,8 @@ namespace BaprAPI
     		var provider = new ReflectionMappingProvider();
     		provider.AddMappingsForType(EntityMappingStore.Instance, typeof(BaprAPI.Models.ILocation));
     		EntityMappingStore.Instance.SetImplMapping<BaprAPI.Models.ILocation, BaprAPI.Models.Location>();
-    		provider.AddMappingsForType(EntityMappingStore.Instance, typeof(BaprAPI.Models.IAttribute));
-    		EntityMappingStore.Instance.SetImplMapping<BaprAPI.Models.IAttribute, BaprAPI.Models.Attribute>();
+    		provider.AddMappingsForType(EntityMappingStore.Instance, typeof(BaprAPI.Models.ILocationAttribute));
+    		EntityMappingStore.Instance.SetImplMapping<BaprAPI.Models.ILocationAttribute, BaprAPI.Models.LocationAttribute>();
     		provider.AddMappingsForType(EntityMappingStore.Instance, typeof(BaprAPI.Models.IUser));
     		EntityMappingStore.Instance.SetImplMapping<BaprAPI.Models.IUser, BaprAPI.Models.User>();
     		provider.AddMappingsForType(EntityMappingStore.Instance, typeof(BaprAPI.Models.IInterest));
@@ -114,7 +118,7 @@ namespace BaprAPI
     	private void InitializeContext() 
     	{
     		Locations = 	new BrightstarEntitySet<BaprAPI.Models.ILocation>(this);
-    		Attributes = 	new BrightstarEntitySet<BaprAPI.Models.IAttribute>(this);
+    		LocationAttributes = 	new BrightstarEntitySet<BaprAPI.Models.ILocationAttribute>(this);
     		Users = 	new BrightstarEntitySet<BaprAPI.Models.IUser>(this);
     		Interests = 	new BrightstarEntitySet<BaprAPI.Models.IInterest>(this);
     		UserPreferences = 	new BrightstarEntitySet<BaprAPI.Models.IUserPreference>(this);
@@ -125,7 +129,7 @@ namespace BaprAPI
     		get; private set;
     	}
     	
-    	public IEntitySet<BaprAPI.Models.IAttribute> Attributes
+    	public IEntitySet<BaprAPI.Models.ILocationAttribute> LocationAttributes
     	{
     		get; private set;
     	}
@@ -150,8 +154,8 @@ namespace BaprAPI
             if (typeof(T).Equals(typeof(BaprAPI.Models.ILocation))) {
                 return (IEntitySet<T>)this.Locations;
             }
-            if (typeof(T).Equals(typeof(BaprAPI.Models.IAttribute))) {
-                return (IEntitySet<T>)this.Attributes;
+            if (typeof(T).Equals(typeof(BaprAPI.Models.ILocationAttribute))) {
+                return (IEntitySet<T>)this.LocationAttributes;
             }
             if (typeof(T).Equals(typeof(BaprAPI.Models.IUser))) {
                 return (IEntitySet<T>)this.Users;
@@ -170,7 +174,8 @@ namespace BaprAPI
 }
 namespace BaprAPI.Models 
 {
-    
+    	
+    	[Newtonsoft.Json.JsonConverterAttribute(typeof(LocationConverter))]
     public partial class Location : BrightstarEntityObject, ILocation 
     {
     	public Location(BrightstarEntityContext context, BrightstarDB.Client.IDataObject dataObject) : base(context, dataObject) { }
@@ -195,9 +200,21 @@ namespace BaprAPI.Models
             		get { return GetRelatedProperty<System.String>("name"); }
             		set { SetRelatedProperty("name", value); }
     	}
-    	public System.Collections.Generic.ICollection<BaprAPI.Models.IAttribute> attributes
+    
+    	public System.Boolean IsVisited
     	{
-    		get { return GetRelatedObjects<BaprAPI.Models.IAttribute>("attributes"); }
+            		get { return GetRelatedProperty<System.Boolean>("IsVisited"); }
+            		set { SetRelatedProperty("IsVisited", value); }
+    	}
+    
+    	public System.Boolean IsFavorite
+    	{
+            		get { return GetRelatedProperty<System.Boolean>("IsFavorite"); }
+            		set { SetRelatedProperty("IsFavorite", value); }
+    	}
+    	public System.Collections.Generic.ICollection<BaprAPI.Models.ILocationAttribute> attributes
+    	{
+    		get { return GetRelatedObjects<BaprAPI.Models.ILocationAttribute>("attributes"); }
     		set { if (value == null) throw new ArgumentNullException("value"); SetRelatedObjects("attributes", value); }
     								}
     	#endregion
@@ -206,12 +223,12 @@ namespace BaprAPI.Models
 namespace BaprAPI.Models 
 {
     
-    public partial class Attribute : BrightstarEntityObject, IAttribute 
+    public partial class LocationAttribute : BrightstarEntityObject, ILocationAttribute 
     {
-    	public Attribute(BrightstarEntityContext context, BrightstarDB.Client.IDataObject dataObject) : base(context, dataObject) { }
-        public Attribute(BrightstarEntityContext context) : base(context, typeof(Attribute)) { }
-    	public Attribute() : base() { }
-    	#region Implementation of BaprAPI.Models.IAttribute
+    	public LocationAttribute(BrightstarEntityContext context, BrightstarDB.Client.IDataObject dataObject) : base(context, dataObject) { }
+        public LocationAttribute(BrightstarEntityContext context) : base(context, typeof(LocationAttribute)) { }
+    	public LocationAttribute() : base() { }
+    	#region Implementation of BaprAPI.Models.ILocationAttribute
     
     	public System.String Name
     	{
@@ -260,6 +277,11 @@ namespace BaprAPI.Models
             get { return GetRelatedObject<BaprAPI.Models.IUserPreference>("UserPreference"); }
             set { SetRelatedObject<BaprAPI.Models.IUserPreference>("UserPreference", value); }
     	}
+    	public System.Collections.Generic.ICollection<BaprAPI.Models.ILocation> MarkedLocations
+    	{
+    		get { return GetRelatedObjects<BaprAPI.Models.ILocation>("MarkedLocations"); }
+    		set { if (value == null) throw new ArgumentNullException("value"); SetRelatedObjects("MarkedLocations", value); }
+    								}
     	#endregion
     }
 }

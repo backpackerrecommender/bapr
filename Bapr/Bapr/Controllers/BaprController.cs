@@ -4,6 +4,10 @@ using Bapr.Utils;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System;
+using System.Net.Http;
+using System.Web.Script.Serialization;
+using System.Net.Http.Headers;
+using Newtonsoft.Json;
 
 namespace Bapr.Controllers
 {
@@ -30,12 +34,43 @@ namespace Bapr.Controllers
 
         public ActionResult  GetFavouritedPlaces()
         {
-            return  Json(new {}, JsonRequestBehavior.AllowGet);
+            string user = Session["logged_username"].ToString();
+
+            HttpClient client = new HttpClient();
+            client.BaseAddress = new Uri("http://localhost:18323/api/MarkedLocations/Favorites");
+            client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+
+            string urlParameters = "?user=" + user;
+            HttpResponseMessage response = client.GetAsync(urlParameters).Result;
+            if (response.IsSuccessStatusCode)
+            {
+                string result = response.Content.ReadAsStringAsync().Result;
+                Collection<Location> markedLocations = JsonConvert.DeserializeObject<Collection<Location>>(result);
+                return Json(markedLocations, JsonRequestBehavior.AllowGet);
+            }
+ 
+            return Json(new { }, JsonRequestBehavior.AllowGet);
         }
         public ActionResult GetVisitedPlaces()
         {
+            string user = Session["logged_username"].ToString();
+
+            HttpClient client = new HttpClient();
+            client.BaseAddress = new Uri("http://localhost:18323/api/MarkedLocations/Visited");
+            client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+
+            string urlParameters = "?user=" + user;
+            HttpResponseMessage response = client.GetAsync(urlParameters).Result;
+            if (response.IsSuccessStatusCode)
+            {
+                string result = response.Content.ReadAsStringAsync().Result;
+                Collection<Location> markedLocations = JsonConvert.DeserializeObject<Collection<Location>>(result);
+                return Json(markedLocations, JsonRequestBehavior.AllowGet);
+            }
+
             return Json(new { }, JsonRequestBehavior.AllowGet);
         }
+
         public ActionResult GetPlacesByText(string text, string latitude, string longitude)
         {
             ICollection<Location> locations = new Collection<Location>();
@@ -49,13 +84,20 @@ namespace Bapr.Controllers
             return Json(new { }, JsonRequestBehavior.AllowGet);
         }
 
-        public ActionResult AddToFavorites(Location location)
+        public ActionResult MarkLocation(Location location, string type)
         {
-            return Json(new { }, JsonRequestBehavior.AllowGet);
-        }
+            string user = Session["logged_username"].ToString();
 
-        public ActionResult AddToVisited(Location location)
-        {
+            HttpClient client = new HttpClient();
+            client.BaseAddress = new Uri("http://localhost:18323/api/MarkedLocations/MarkLocation");
+            client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+
+            var json = new JavaScriptSerializer().Serialize(location);
+            string urlParameters = "?user=" + user + "&location=" + json.ToString() + "&type=" + type;
+
+            HttpContent content = new StringContent("");
+            HttpResponseMessage response = client.PostAsync(urlParameters, content).Result;
+
             return Json(new { }, JsonRequestBehavior.AllowGet);
         }
 

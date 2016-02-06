@@ -14,5 +14,7 @@ namespace BaprAPI.Models
         string Password { get; set; }
 
         IUserPreference UserPreference {get; set;}
+
+        ICollection<ILocation> MarkedLocations { get; set; }
     }
 }

@@ -1,4 +1,5 @@
-﻿using BrightstarDB.Client;
+﻿using BaprAPI.Models;
+using BrightstarDB.Client;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,8 +15,8 @@ namespace BaprAPI.Controllers
         [ActionName("Register")]
         public HttpResponseMessage Register(string Email, string Password)
         {
-            string connectionString = "type=embedded;storesdirectory=" + "D:\\brightstar" + ";storename=Users";
-
+            string connectionString = Constants.storeConnectionString;
+            
             var client = BrightstarService.GetClient(connectionString);
 
             using (var ctx = new MyEntityContext(connectionString))
@@ -38,8 +39,8 @@ namespace BaprAPI.Controllers
         [ActionName("LogIn")]
         public HttpResponseMessage LogIn(string Email, string Password)
         {
-            string connectionString = "type=embedded;storesdirectory=" + "D:\\brightstar" + ";storename=Users";
-
+            string connectionString = Constants.storeConnectionString;
+            
             var client = BrightstarService.GetClient(connectionString);
             
             using (var ctx = new MyEntityContext(connectionString))

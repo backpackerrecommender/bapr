@@ -13,6 +13,10 @@ namespace Bapr.Models
 
         public String name { get; set; }
 
+        public bool IsVisited { get; set; }
+
+        public bool IsFavorite { get; set; }
+
         public ICollection<LocationAttribute> attributes { get; set; }
     }
 
@@ -21,6 +25,8 @@ namespace Bapr.Models
         public String Name { get; set; }
         public String Value { get; set; }
         public String Type { get; set; }
+
+        public LocationAttribute() { }
 
         public LocationAttribute(String name, String value, String type)
         {
