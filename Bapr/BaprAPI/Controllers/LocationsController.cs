@@ -22,8 +22,8 @@ namespace BaprAPI.Controllers
                 + "?s rdfs:label ?name. filter contains(lcase(?name),lcase(\"" + text.ToLower() + "\"))\n"
                 + "?s a ?type  .\n"
                 + "FILTER(langMatches(lang(?name ), \"en\") "
-                  + " && ?lat >" + (latitude - 1) + " && ?lat < " + (latitude + 1)
-                  + " && ?long > " + (longitude - 1) + " && ?long < " + (longitude + 1)
+                  + " && ?lat >" + latitude  + " - 1 && ?lat < " + latitude + "+ 1 "
+                  + " && ?long > " + longitude  + " - 1 && ?long < " + longitude + " + 1"
                  + "  && contains(lcase(?name),lcase(\"" + text.ToLower() + "\"))"
                  + "  && (?type=dbo:City || ?type=dbo:Town || ?type=dbo:Village || ?type=dbo:Restaurant || ?type=dbo:Park || ?type=dbo:Garden || ?type=dbo:HistoricPlace || ?type=dbo:Monument)) "
                 + "}LIMIT 10";

@@ -76,7 +76,7 @@ namespace BaprAPI.Controllers
 
         private ICollection<ILocation> GetFromLinkedGeoData(double latitude, double longitude, IUserPreference userPreference)
         {
-         
+
             string searchHotelsQuery = "SELECT DISTINCT * WHERE { ?f a lgd:Hotel .\n"
                 + " ?f rdfs:label ?name . \n"
                 + " ?f foaf:homepage ?website .\n"
@@ -86,12 +86,11 @@ namespace BaprAPI.Controllers
                 + " OPTIONAL {?f lgd:rooms ?rooms.} \n"
                 + " OPTIONAL {?f lgd:internet_access ?internetAccess.} \n"
                 + " OPTIONAL {?f lgd:opening_hours ?opening_hours.} \n"
-              //  + " OPTIONAL {?f lgd:wheelchair ?wheelchair."
-               // + (userPreference.NeedMedicalSupport ? "filter contains(lcase(?wheelchair), \"true\") } \n" : " } \n")
+                + (userPreference.NeedMedicalSupport ? "?f lgd:wheelchair ?wheelchair. FILTER (?wheelchair =" + BaprAPI.Models.Constants.xsdBooleanIsTrue + ")\n"
+                                                      : " OPTIONAL {?f lgd:wheelchair ?wheelchair.} \n")
                 + " OPTIONAL {?f lgd:stars ?stars. } \n"
                 + " OPTIONAL {?f lgd:operator ?operator. } \n"
-               // + "FILTER ( langMatches(lang(?name), \"EN\"))"
-                + " FILTER( ?lat > " + latitude + " - 1  && ?lat < " + latitude + " + 1"
+                + " FILTER ( ?lat > " + latitude + " - 1  && ?lat < " + latitude + " + 1"
                 + " && ?long > " + longitude + " - 1 && ?long < " + longitude + " + 1 )\n"
                 + "} LIMIT 10";
 
