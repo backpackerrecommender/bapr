@@ -79,8 +79,34 @@ namespace Bapr.Controllers
 
             return Json(locations, JsonRequestBehavior.AllowGet);
         }
-        public ActionResult GetPlacesByCategory(PlaceCategory category, string latitude, string longitude)
+        public ActionResult GetPlacesByCategory(PlaceCategory category, double latitude, double longitude)
         {
+            HttpClient client = new HttpClient();
+
+            switch (category)
+            {
+                case PlaceCategory.Museums:
+                    client.BaseAddress = new Uri("http://localhost:18323/api/Museums/GetMuseumsNearby");
+                    break;
+                case PlaceCategory.Hospitals:
+                    client.BaseAddress = new Uri("http://localhost:18323/api/Hospitals/GetHospitalsNearby");
+                    break;
+                //case PlaceCategory.Hotels:
+                //    client.BaseAddress = new Uri("http://localhost:18323/api/Hotels/GetHotelsNearby");
+                //    break;
+                //case PlaceCategory.Restaurants:
+                //    client.BaseAddress = new Uri("http://localhost:18323/api/Restaurants/GetRestaurantsNearby");
+                //    break;
+                //case PlaceCategory.Shops:
+                //    client.BaseAddress = new Uri("http://localhost:18323/api/Shops/GetShopsNearby");
+                //    break;
+                default:
+                    client.BaseAddress = new Uri("http://localhost:18323/api/Museums/GetHospitalsNearby");
+                    break;
+            }
+            string urlParameters = "?lat=" + latitude + "&lng=" + longitude;
+            HttpResponseMessage response = client.GetAsync(urlParameters).Result;
+            var result = response.Content.ReadAsStringAsync().Result;
             return Json(new { }, JsonRequestBehavior.AllowGet);
         }
 

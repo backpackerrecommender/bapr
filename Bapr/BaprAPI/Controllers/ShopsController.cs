@@ -40,7 +40,7 @@ namespace BaprAPI.Controllers
             //    System.Diagnostics.Debug.WriteLine(t.ToString());
             //}
         }
-        private Graph DbPedia_GetAllShopsNearby(string lat, string lng)  //Barcelona: lat = 41.390205 lng = 2.154007
+        public Graph DbPedia_GetAllShopsNearby(string lat, string lng)  //Barcelona: lat = 41.390205 lng = 2.154007
         {                                                                    //1 degree = 110 km lat
             string myQuery = String.Format(@"construct where { 
                                ?s a dbo:ShoppingMall; 

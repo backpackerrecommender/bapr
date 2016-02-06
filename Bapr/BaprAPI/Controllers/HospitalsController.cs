@@ -47,7 +47,7 @@ namespace BaprAPI.Controllers
                                geo:lat ?lat;
                                geo:long ?long.
                                FILTER (?lat > {0} - 1 && ?lat < {0} + 1 && 
-                                       ?long > {1} - 1 && ?long < {1} + 1 && )
+                                       ?long > {1} - 1 && ?long < {1} + 1 )
                                }
                                LIMIT 20", lat, lng);
 
