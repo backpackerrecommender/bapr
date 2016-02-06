@@ -27,28 +27,11 @@ namespace BaprAPI.Controllers
         [HttpGet]
         public HttpResponseMessage GetByCoordinates(double lat, double lng, string userEmail)
         {
-            var userPreference = GetUserPreference(userEmail);
+            var userPreference = BaprAPI.Utils.Utils.GetUserPreference(userEmail);
             var fromDbPedia = GetFromDbpedia(lat, lng, userPreference);
             var fromLinkedGeoData = GetFromLinkedGeoData(lat, lng, userPreference);
             return new HttpResponseMessage(HttpStatusCode.OK);//200
         }
-        private IUserPreference GetUserPreference(string email)
-        {
-             var connectionString = "type=embedded;storesdirectory=" + "D:\\brightstar" + ";storename=Users";
-             var client = BrightstarService.GetClient(connectionString);
-
-
-             using (var ctx = new MyEntityContext(connectionString))
-             {
-                 var currentUser = ctx.Users.FirstOrDefault(x => x.Email == email);
-                 if (currentUser != null)
-                 {
-                     return currentUser.UserPreference;
-                 }
-             }
-            return new UserPreference();
-        }
-
         private ICollection<ILocation> GetFromDbpedia(double latitude, double longitude, IUserPreference userPreference)
         {
             string searchHotelsQuery = "SELECT DISTINCT * WHERE {\n ?f a dbo:Hotel ."

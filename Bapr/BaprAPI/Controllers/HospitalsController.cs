@@ -66,10 +66,6 @@ namespace BaprAPI.Controllers
             ISparqlQueryProcessor processor = new RemoteQueryProcessor(endPoint);
 
             return (Graph)processor.ProcessQuery(query);
-
-            //SparqlJsonWriter jsonWriter = new SparqlJsonWriter();
-            //TextWriter writer = System.IO.File.CreateText("C:\\Users\\Oana\\Desktop\\results.txt");
-            //jsonWriter.Save(processor.ProcessQuery(query), writer);
         }
 
         private Graph LinkedGeoData_GetAllHospitalsNearby(string lat, string lng)
