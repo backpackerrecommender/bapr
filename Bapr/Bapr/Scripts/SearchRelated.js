@@ -16,6 +16,11 @@ function initMap(latitude, longitude) {
 }
 
 $(document).ready(function () {
+    $body = $("body");
+    $(document).on({
+        ajaxStart: function () { $body.addClass("loading"); },
+        ajaxStop: function () { $body.removeClass("loading"); }
+    });
     $("#tabs").tabs();
     $('#btnGetFavourites').click(function() {
         insertHTML("locationDetails", "");

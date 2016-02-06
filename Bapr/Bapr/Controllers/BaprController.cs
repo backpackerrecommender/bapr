@@ -73,6 +73,24 @@ namespace Bapr.Controllers
 
         public ActionResult GetPlacesByText(string text, string latitude, string longitude)
         {
+            if (!string.IsNullOrEmpty(text))
+            {
+                using (var client = new HttpClient())
+                {
+                    client.BaseAddress = new Uri("http://localhost:18323/api/Locations/Get");
+                    client.DefaultRequestHeaders.Accept.Clear();
+                    client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+
+                    var urlParam = "?text=" + text + "&latitude=" + latitude + "&longitude=" + longitude;
+                    HttpResponseMessage response = client.GetAsync(urlParam).Result;
+                    if (response.IsSuccessStatusCode)
+                    {
+                        var x = response.Content.ReadAsStringAsync().Result;
+                        return Json(x, JsonRequestBehavior.AllowGet);
+                    }
+                }
+            }
+
             ICollection<Location> locations = new Collection<Location>();
             locations.Add(GetMockLocation());
             locations.Add(GetMockLocation2());
@@ -91,9 +109,9 @@ namespace Bapr.Controllers
                 case PlaceCategory.Hospitals:
                     client.BaseAddress = new Uri("http://localhost:18323/api/Hospitals/GetHospitalsNearby");
                     break;
-                //case PlaceCategory.Hotels:
-                //    client.BaseAddress = new Uri("http://localhost:18323/api/Hotels/GetHotelsNearby");
-                //    break;
+                case PlaceCategory.Hotels:
+                    client.BaseAddress = new Uri("http://localhost:18323/api/Hotels/GetByCoordinates");
+                    break;
                 //case PlaceCategory.Restaurants:
                 //    client.BaseAddress = new Uri("http://localhost:18323/api/Restaurants/GetRestaurantsNearby");
                 //    break;
@@ -104,8 +122,15 @@ namespace Bapr.Controllers
                     client.BaseAddress = new Uri("http://localhost:18323/api/Museums/GetHospitalsNearby");
                     break;
             }
-            string urlParameters = "?lat=" + latitude + "&lng=" + longitude;
-            HttpResponseMessage response = client.GetAsync(urlParameters).Result;
+       
+            var session = Session["logged_username"];
+            var userEmail = string.Empty;
+            if (session != null)
+            {
+                userEmail = session.ToString();
+            }
+            var urlParam = "?lat=" + latitude + "&lng=" + longitude + "&userEmail=" + userEmail;
+            HttpResponseMessage response = client.GetAsync(urlParam).Result;
             var result = response.Content.ReadAsStringAsync().Result;
             return Json(new { }, JsonRequestBehavior.AllowGet);
         }
