@@ -16,7 +16,7 @@ namespace BaprAPI.Utils
     {
         public static IUserPreference GetUserPreference(string email)
         {
-            var connectionString = "type=embedded;storesdirectory=" + "D:\\brightstar" + ";storename=Users";
+            var connectionString = "type=embedded;storesdirectory=" + Constants.StoreLocation + ";storename=Users";
             var client = BrightstarService.GetClient(connectionString);
 
             using (var ctx = new MyEntityContext(connectionString))

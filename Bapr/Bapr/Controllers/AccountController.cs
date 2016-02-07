@@ -3,6 +3,7 @@ using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Configuration;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
@@ -51,7 +52,7 @@ namespace Bapr.Controllers
         private HttpResponseMessage SaveUserPreferences(UserPreference preferences, string user)
         {
             HttpClient client = new HttpClient();
-            client.BaseAddress = new Uri("http://localhost:18323/api/UserPreference/SaveUserPreference");
+            client.BaseAddress = new Uri(ConfigurationManager.AppSettings["APIurl"] + "/api/UserPreference/SaveUserPreference");
             client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
             var json = new JavaScriptSerializer().Serialize(preferences);
@@ -79,7 +80,7 @@ namespace Bapr.Controllers
 
             using (var client = new HttpClient())
             {
-                client.BaseAddress = new Uri("http://localhost:18323/api/UserPreference/GetUserPreference");
+                client.BaseAddress = new Uri(ConfigurationManager.AppSettings["APIurl"] + "/api/UserPreference/GetUserPreference");
                 client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
                 string urlParameters = "?user=" + user;
@@ -150,7 +151,7 @@ namespace Bapr.Controllers
                 return View(model);
             }
             HttpClient client = new HttpClient();
-            client.BaseAddress = new Uri("http://localhost:18323/api/LogIn/Register");
+            client.BaseAddress = new Uri(ConfigurationManager.AppSettings["APIurl"] + "/api/LogIn/Register");
             client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
             string urlParameters = "?email=" + model.Email + "&password=" + EncryptPassword(model.Password);
 
@@ -177,7 +178,7 @@ namespace Bapr.Controllers
                 return View(userModel);
             }
             HttpClient client = new HttpClient();
-            client.BaseAddress = new Uri("http://localhost:18323/api/LogIn/LogIn");
+            client.BaseAddress = new Uri(ConfigurationManager.AppSettings["APIurl"] + "/api/LogIn/LogIn");
             client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
             string urlParameters = "?email=" + userModel.Email + "&password=" + EncryptPassword(userModel.Password);
 
