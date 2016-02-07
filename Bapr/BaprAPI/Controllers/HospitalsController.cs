@@ -16,45 +16,50 @@ using VDS.RDF.Writing.Formatting;
 using System.Net;
 using System.Net.Http;
 using System.Web.Http;
+using BaprAPI.Models;
+using System.Collections.ObjectModel;
 
 namespace BaprAPI.Controllers
 {
     public class HospitalsController : ApiController
     {
-        public void GetAllHospitalsNearby(string lat, string lng)
+        [HttpGet]
+        [ActionName("GetAllHospitalsNearby")]
+        public HttpResponseMessage GetAllHospitalsNearby(double lat, double lng, string userEmail)
         {
-            Graph dbPediaResults = DbPedia_GetAllHospitalsNearby(lat, lng);
-            Graph linkedGeoDataResults = LinkedGeoData_GetAllHospitalsNearby(lat, lng);
-            Graph ontologySchema = new Graph();
-            FileLoader.Load(ontologySchema, "C:\\Users\\Oana\\bapr\\test4_rdf.owl");
-
-            IUriNode rdfType = dbPediaResults.CreateUriNode(new Uri(RdfSpecsHelper.RdfType));
-            IUriNode hospital = dbPediaResults.CreateUriNode("dbo:Hospital");
-
-            StaticRdfsReasoner reasoner = new StaticRdfsReasoner();
-            reasoner.Initialise(ontologySchema);
-            reasoner.Apply(dbPediaResults);
-
-            //foreach (Triple t in dbPediaResults.GetTriplesWithPredicateObject(rdfType, hospital))
-            //{
-            //    System.Diagnostics.Debug.WriteLine(t.ToString());
-            //}
+            var userPreference = BaprAPI.Utils.Utils.GetUserPreference(userEmail);
+            var fromDbPedia = DbPedia_GetAllHospitalsNearby(lat, lng, userPreference);
+            var fromLinkedGeoData = LinkedGeoData_GetAllHospitalsNearby(lat, lng, userPreference);
+            return new HttpResponseMessage(HttpStatusCode.OK);//200
         }
-        private Graph DbPedia_GetAllHospitalsNearby(string lat, string lng)  //Barcelona: lat = 41.390205 lng = 2.154007
-        {                                                                    //1 degree = 110 km lat
-            string myQuery = String.Format(@"construct where { 
-                               ?s a dbo:Hospital; 
-                               geo:lat ?lat;
-                               geo:long ?long.
-                               FILTER (?lat > {0} - 1 && ?lat < {0} + 1 && 
-                                       ?long > {1} - 1 && ?long < {1} + 1 )
-                               }
-                               LIMIT 20", lat, lng);
+        private Collection<BaprLocation> DbPedia_GetAllHospitalsNearby(double lat, double lng, IUserPreference userPreference)
+        {                                                                                    
+            string myQuery = "SELECT DISTINCT ?name ?website ?address ?phone ?lat ?long \n" +
+                            "WHERE {	\n" +
+                            "?hospital a ?type. \n" +
+                            "?hospital ?p ?name. \n" +
+                            "Optional { ?hospital dbpproperty:address ?address. }\n" +
+                            "Optional { ?hospital dbpproperty:website ?website. }\n" +
+                            "Optional { ?hospital foaf:phone ?phone. }\n" +
+                            "Optional { ?hospital schema:department ?department} \n" +
+                            "?hospital geo:lat ?lat.\n" +
+                            "?hospital geo:long ?long.\n" +
+                            "FILTER (?p=<http://www.w3.org/2000/01/rdf-schema#label>).\n" +
+                            "FILTER (?type IN (<http://dbpedia.org/ontology/Hospital>, <http://schema.org/Hospital>)).\n" +
+                            "FILTER ( ?long > " + lng + " - 1 && ?long < " + lng + " + 1 && \n" +
+                            "?lat > " + lat + " - 1 && ?lat < " + lat + " + 1)\n" +
+                            "FILTER ( lang(?name) = 'en')}\n" +
+                //"FILTER ( regex(str(?category),"Computer","i") ||
+                //regex(str(?type),"Computer","i") ||
+                //regex(str(?abstract),"Computer ","i"))." +
+                            "LIMIT 30";
 
             SparqlParameterizedString dbpediaQuery = new SparqlParameterizedString();
 
             dbpediaQuery.Namespaces.AddNamespace("geo", new Uri("http://www.w3.org/2003/01/geo/wgs84_pos#"));
-            dbpediaQuery.Namespaces.AddNamespace("dbo", new Uri("http://dbpedia.org/ontology/"));
+            dbpediaQuery.Namespaces.AddNamespace("dbpproperty", new Uri("http://dbpedia.org/property/"));
+            dbpediaQuery.Namespaces.AddNamespace("foaf", new Uri("http://xmlns.com/foaf/spec/"));
+            dbpediaQuery.Namespaces.AddNamespace("schema", new Uri("http://schema.org/"));
             dbpediaQuery.CommandText = myQuery;
 
             SparqlQueryParser parser = new SparqlQueryParser();
@@ -65,35 +70,45 @@ namespace BaprAPI.Controllers
             SparqlRemoteEndpoint endPoint = new SparqlRemoteEndpoint(uri);
             ISparqlQueryProcessor processor = new RemoteQueryProcessor(endPoint);
 
-            return (Graph)processor.ProcessQuery(query);
+            SparqlResultSet result = (SparqlResultSet)processor.ProcessQuery(query);
+            return BaprAPI.Utils.Utils.ConvertFromSparqlSetToBaprLocations(result);
         }
 
-        private Graph LinkedGeoData_GetAllHospitalsNearby(string lat, string lng)
+        private Collection<BaprLocation> LinkedGeoData_GetAllHospitalsNearby(double lat, double lng, IUserPreference userPreference)
         {
-            string myQuery = String.Format(@"construct where { 
-                               ?s a lgdo:Hospital; 
-                               geo:lat ?lat;
-                               geo:long ?long.
-                               FILTER (?lat > {0} - 1 && ?lat < {0} + 1 && 
-                                       ?long > {1} - 1 && ?long < {1} + 1 && )
-                               }
-                               LIMIT 20", lat, lng);
+            string myQuery = "SELECT DISTINCT ?name ?address ?homepage ?phone ?lat ?long \n" +
+                            "WHERE {	\n" +
+                            "?hospital a ?type. \n" +
+                            "?hospital ?p ?name. \n" +
+                            "Optional { ?hospital lgdo:address ?address. }\n" +
+                            "Optional { ?hospital foaf:homepage ?homepage. }\n" +
+                            "Optional { ?hospital foaf:phone ?phone. }\n" +
+                            "?hospital geo:lat ?lat.\n" +
+                            "?hospital geo:long ?long.\n" +
+                            "FILTER (?p=<http://www.w3.org/2000/01/rdf-schema#label>).\n" +
+                            "FILTER (?type IN (<http://linkedgeodata.org/ontology/Hospital>, <http://schema.org/Hospital>)).\n" +
+                            "FILTER ( ?long > " + lng + " - 1 && ?long < " + lng + " + 1 && \n" +
+                            "?lat > " + lat + " - 1 && ?lat < " + lat + " + 1)}\n" +
+                            "LIMIT 30";
 
             SparqlParameterizedString lgdoQuery = new SparqlParameterizedString();
 
-            lgdoQuery.Namespaces.AddNamespace("geo", new Uri("http://www.w3.org/2003/01/geo/wgs84_pos#"));
             lgdoQuery.Namespaces.AddNamespace("lgdo", new Uri("http://linkedgeodata.org/ontology/"));
+            lgdoQuery.Namespaces.AddNamespace("geo", new Uri("http://www.w3.org/2003/01/geo/wgs84_pos#"));  
+            lgdoQuery.Namespaces.AddNamespace("foaf", new Uri("http://xmlns.com/foaf/spec/"));
+
             lgdoQuery.CommandText = myQuery;
 
             SparqlQueryParser parser = new SparqlQueryParser();
-            SparqlQuery query = parser.ParseFromString(lgdoQuery);
-            Uri uri = new Uri(@"http://linkedgeodata.org/sparql");
+            SparqlQuery query = parser.ParseFromString(myQuery);
+            Uri uri = new Uri(@"http://dbpedia.org/sparql");
             SparqlResultSet resultSet = new SparqlResultSet();
             ISparqlResultsHandler resultsHandler = new ResultSetHandler(resultSet);
             SparqlRemoteEndpoint endPoint = new SparqlRemoteEndpoint(uri);
             ISparqlQueryProcessor processor = new RemoteQueryProcessor(endPoint);
 
-            return (Graph)processor.ProcessQuery(query);
+            SparqlResultSet result = (SparqlResultSet)processor.ProcessQuery(query);
+            return BaprAPI.Utils.Utils.ConvertFromSparqlSetToBaprLocations(result);
         }
     }
 }

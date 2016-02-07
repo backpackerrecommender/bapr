@@ -118,9 +118,9 @@ namespace Bapr.Controllers
                 case PlaceCategory.Restaurants:
                     client.BaseAddress = new Uri("http://localhost:18323/api/Restaurants/GetRestaurantsNearby");
                     break;
-                //case PlaceCategory.Shops:
-                //    client.BaseAddress = new Uri("http://localhost:18323/api/Shops/GetShopsNearby");
-                //    break;
+                case PlaceCategory.Shops:
+                    client.BaseAddress = new Uri("http://localhost:18323/api/Shops/GetShopsNearby");
+                    break;
                 default:
                     client.BaseAddress = new Uri("http://localhost:18323/api/Museums/GetHospitalsNearby");
                     break;

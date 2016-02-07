@@ -16,45 +16,45 @@ using VDS.RDF.Writing.Formatting;
 using System.Net;
 using System.Net.Http;
 using System.Web.Http;
+using BaprAPI.Models;
+using System.Collections.ObjectModel;
 
 namespace BaprAPI.Controllers
 {
     public class ShopsController : ApiController
     {
-        public void GetAllShopsNearby(string lat, string lng)
+        [HttpGet]
+        [ActionName("GetShopsNearby")]
+        public HttpResponseMessage GetShopsNearby(double lat, double lng, string userEmail)
         {
-            Graph dbPediaResults = DbPedia_GetAllShopsNearby(lat, lng);
-            Graph linkedGeoDataResults = LinkedGeoData_GetAllShopsNearby(lat, lng);
-            Graph ontologySchema = new Graph();
-            FileLoader.Load(ontologySchema, "C:\\Users\\Oana\\bapr\\test4_rdf.owl");
-
-            IUriNode rdfType = dbPediaResults.CreateUriNode(new Uri(RdfSpecsHelper.RdfType));
-            IUriNode hospital = dbPediaResults.CreateUriNode("dbo:ShoppingMall");
-
-            StaticRdfsReasoner reasoner = new StaticRdfsReasoner();
-            reasoner.Initialise(ontologySchema);
-            reasoner.Apply(dbPediaResults);
-
-            //foreach (Triple t in dbPediaResults.GetTriplesWithPredicateObject(rdfType, hospital))
-            //{
-            //    System.Diagnostics.Debug.WriteLine(t.ToString());
-            //}
+            var userPreference = BaprAPI.Utils.Utils.GetUserPreference(userEmail);
+            var fromDbPedia = DbPedia_GetShopsNearby(lat, lng, userPreference);
+            var fromLinkedGeoData = LinkedGeoData_GetShopsNearby(lat, lng, userPreference);
+          //  Collection<BaprLocation> result = fromDbPedia.Concat(fromLinkedGeoData).ToList();
+            return new HttpResponseMessage(HttpStatusCode.OK);//200
         }
-        public Graph DbPedia_GetAllShopsNearby(string lat, string lng)  //Barcelona: lat = 41.390205 lng = 2.154007
-        {                                                                    //1 degree = 110 km lat
-            string myQuery = String.Format(@"construct where { 
-                               ?s a dbo:ShoppingMall; 
-                               geo:lat ?lat;
-                               geo:long ?long.
-                               FILTER (?lat > {0} - 1 && ?lat < {0} + 1 && 
-                                       ?long > {1} - 1 && ?long < {1} + 1 && )
-                               }
-                               LIMIT 20", lat, lng);
+        public Collection<BaprLocation> DbPedia_GetShopsNearby(double lat, double lng, IUserPreference userPreference) 
+        {
+            string myQuery = "SELECT DISTINCT ?name ?address ?openingHours ?lat ?long  \n" +
+                           "WHERE {	\n" +
+                           "?shop a ?type. \n" +
+                           "?shop ?p ?name. \n" +
+                           "Optional { ?shop dbpproperty:address ?address. }" +
+                           "Optional { ?shop schema:openingHours ?openingHours. }\n" +
+                           "?shop geo:lat ?lat.\n" +
+                           "?shop geo:long ?long.\n" +
+                           "FILTER (?p=<http://www.w3.org/2000/01/rdf-schema#label>).\n" +
+                           "FILTER (?type IN (<http://dbpedia.org/ontology/ShoppingMall>, <http://schema.org/ShoppingCenter>)).\n" +
+                           //"FILTER ( ?long > " + lng + " - 1 && ?long < " + lng + " + 1 && \n" +
+                           //"?lat > " + lat + " - 1 && ?lat < " + lat + " + 1)\n" +
+                           "FILTER ( lang(?name) = 'en')}\n" +
+                           "LIMIT 30";
 
             SparqlParameterizedString dbpediaQuery = new SparqlParameterizedString();
 
             dbpediaQuery.Namespaces.AddNamespace("geo", new Uri("http://www.w3.org/2003/01/geo/wgs84_pos#"));
-            dbpediaQuery.Namespaces.AddNamespace("dbo", new Uri("http://dbpedia.org/ontology/"));
+            dbpediaQuery.Namespaces.AddNamespace("dbpproperty", new Uri("http://dbpedia.org/property/"));
+            dbpediaQuery.Namespaces.AddNamespace("schema", new Uri("http://schema.org/"));
             dbpediaQuery.CommandText = myQuery;
 
             SparqlQueryParser parser = new SparqlQueryParser();
@@ -65,28 +65,33 @@ namespace BaprAPI.Controllers
             SparqlRemoteEndpoint endPoint = new SparqlRemoteEndpoint(uri);
             ISparqlQueryProcessor processor = new RemoteQueryProcessor(endPoint);
 
-            return (Graph)processor.ProcessQuery(query);
-
-            //SparqlJsonWriter jsonWriter = new SparqlJsonWriter();
-            //TextWriter writer = System.IO.File.CreateText("C:\\Users\\Oana\\Desktop\\results.txt");
-            //jsonWriter.Save(processor.ProcessQuery(query), writer);
+            SparqlResultSet result = (SparqlResultSet)processor.ProcessQuery(query);
+            return BaprAPI.Utils.Utils.ConvertFromSparqlSetToBaprLocations(result);
         }
 
-        private Graph LinkedGeoData_GetAllShopsNearby(string lat, string lng)
+        private Collection<BaprLocation> LinkedGeoData_GetShopsNearby(double lat, double lng, IUserPreference userPreference)
         {
-            string myQuery = String.Format(@"construct where { 
-                               ?s a lgdo:Shop; 
-                               geo:lat ?lat;
-                               geo:long ?long.
-                               FILTER (?lat > {0} - 1 && ?lat < {0} + 1 && 
-                                       ?long > {1} - 1 && ?long < {1} + 1 && )
-                               }
-                               LIMIT 20", lat, lng);
+            string myQuery = "SELECT DISTINCT ?name ?address ?homepage ?phone ?lat ?long \n" +
+                            "WHERE {	\n" +
+                            "?shop a ?type. \n" +
+                            "?shop ?p ?name. \n" +
+                            "Optional { ?shop lgdo:address ?address. }\n" +
+                            "Optional { ?shop foaf:homepage ?homepage. }\n" +
+                            "Optional { ?shop foaf:phone ?phone. }\n" +
+                            "?shop geo:lat ?lat.\n" +
+                            "?shop geo:long ?long.\n" +
+                            "FILTER (?p=<http://www.w3.org/2000/01/rdf-schema#label>).\n" +
+                            "FILTER (?type IN (<http://linkedgeodata.org/ontology/ShoppingCenter>, <http://schema.org/ShoppingCenter>))\n" +
+                            //"FILTER ( ?long > " + lng + " - 1 && ?long < " + lng + " + 1 && \n" +
+                            //"?lat > " + lat + " - 1 && ?lat < " + lat + " + 1)\n" +
+                            "}LIMIT 30";
 
             SparqlParameterizedString lgdoQuery = new SparqlParameterizedString();
 
-            lgdoQuery.Namespaces.AddNamespace("geo", new Uri("http://www.w3.org/2003/01/geo/wgs84_pos#"));
             lgdoQuery.Namespaces.AddNamespace("lgdo", new Uri("http://linkedgeodata.org/ontology/"));
+            lgdoQuery.Namespaces.AddNamespace("geo", new Uri("http://www.w3.org/2003/01/geo/wgs84_pos#"));
+            lgdoQuery.Namespaces.AddNamespace("foaf", new Uri("http://xmlns.com/foaf/spec/"));
+
             lgdoQuery.CommandText = myQuery;
 
             SparqlQueryParser parser = new SparqlQueryParser();
@@ -97,7 +102,8 @@ namespace BaprAPI.Controllers
             SparqlRemoteEndpoint endPoint = new SparqlRemoteEndpoint(uri);
             ISparqlQueryProcessor processor = new RemoteQueryProcessor(endPoint);
 
-            return (Graph)processor.ProcessQuery(query);
+            SparqlResultSet result = (SparqlResultSet)processor.ProcessQuery(query);
+            return BaprAPI.Utils.Utils.ConvertFromSparqlSetToBaprLocations(result);
         }
     }
 }
