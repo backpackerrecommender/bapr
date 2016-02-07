@@ -21,7 +21,7 @@ function setUserCurrentPositionMarker(latLng, map) {
 }
 
 $(document).ready(function () {
-    var allMarkers =[];
+ 
     $body = $("body");
     $(document).on({
         ajaxStart: function () { $body.addClass("loading"); },
@@ -87,7 +87,7 @@ function deserializeLocations(locations) {
     }
 return [];
 }
-
+   var allMarkers =[];
 function clearOverlays() {
   for (var i = 0; i < allMarkers.length; i++) {
     allMarkers[i].setMap(null);

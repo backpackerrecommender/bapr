@@ -27,12 +27,14 @@ namespace BaprAPI.Controllers
         public ICollection<BaprLocation> GetFromDbpedia(string text, double latitude, double longitude, IUserPreference userPreference)
         {
             var cuisineFromDb = BaprAPI.Utils.Utils.GetCuisines(userPreference, true);
-            string searchQueryByText = "SELECT DISTINCT ?lat ?long ?name ?address ?cuisine ?website WHERE{\n"
+            string searchQueryByText = "SELECT DISTINCT ?lat ?long ?name ?address ?cuisine ?website ?established ?comment WHERE{\n"
               + "?s a dbo:Location .\n"
               + "?s geo:lat ?lat .\n"
               + "?s geo:long ?long .\n"
               + "?s rdfs:label ?name.\n"
               + "?s a ?type. \n"
+              + "OPTIONAL { ?s dbp:established ?established.}\n"
+              + "OPTIONAL { ?s rdfs:comment ?comment. FILTER(langMatches(lang(?comment ), \"en\"))}\n"
               + "OPTIONAL { ?s dbo:address ?address .}\n "
               + "OPTIONAL { ?s dbo:cuisine ?cuisine .}\n"
               + "OPTIONAL { ?s foaf:homepage ?website .}\n"
@@ -41,8 +43,9 @@ namespace BaprAPI.Controllers
                 + " && ?long > " + longitude + " - 1 && ?long < " + longitude + " + 1"
                + "  && contains(lcase(?name),lcase(\"" + text.ToLower() + "\"))"
                + "  && ((?type=dbo:Restaurant &&" + (!string.IsNullOrEmpty(cuisineFromDb) ? " lcase(?cuisine) in (" + cuisineFromDb + ")) " : string.Empty)
-                    + "|| ?type=dbo:Town || ?type=dbo:Village "
-                    + "|| ?type=dbo:Park || ?type=dbo:Garden || ?type=dbo:HistoricPlace || ?type=dbo:Monument)) "
+                      +"|| (?type = dbo:Museum && contains(lcase(str(?type)), \"history\") )"
+                      + "|| ?type=dbo:Town || ?type=dbo:Village "
+                      + "|| ?type=dbo:Park || ?type=dbo:Garden || ?type=dbo:HistoricPlace || ?type=dbo:Monument)) "
               + "}LIMIT 20";
 
             SparqlParameterizedString sparqlQueryString = new SparqlParameterizedString();
