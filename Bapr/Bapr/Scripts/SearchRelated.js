@@ -1,21 +1,27 @@
-﻿
+﻿var map;
 function initMap(latitude, longitude) {
     var latLng = { lat: latitude, lng: longitude };
 
-    var map = new google.maps.Map(document.getElementById('map'), {
+     map = new google.maps.Map(document.getElementById('map'), {
         zoom: 10,
         center: latLng
     });
 
 
-    var marker = new google.maps.Marker({
-        position: latLng,
-        map: map,
-        title: 'Hello World!'
-    });
+    setUserCurrentPositionMarker(latLng, map);
+}
+
+function setUserCurrentPositionMarker(latLng, map) {
+     var marker = new google.maps.Marker({
+             position: latLng,
+             map: map,
+                     title: 'My location!',
+                     });
+     marker.setIcon('http://maps.google.com/mapfiles/ms/icons/green-dot.png');
 }
 
 $(document).ready(function () {
+    var allMarkers =[];
     $body = $("body");
     $(document).on({
         ajaxStart: function () { $body.addClass("loading"); },
@@ -45,11 +51,7 @@ $(document).ready(function () {
         var longitude = $('.longitude').attr('title');
         if (text != null && text != "") {
             $.get(url, { text: text, latitude: latitude, longitude: longitude }, function (data) {
-                try {
-                    locReadyForDisplay = JSON.parse(data);
-                } catch (ex) {
-                    console.error(ex);
-                }
+               locReadyForDisplay = deserializeLocations(data);
                 displayMarkers(locReadyForDisplay);
             });
         }
@@ -64,24 +66,42 @@ $(document).ready(function () {
         var longitude = $('.longitude').attr('title');
         if (selectedValue != "Empty") {
             $.get(url, { category: selectedValue, latitude: latitude, longitude: longitude }, function (data) {
-
+                locReadyForDisplay = deserializeLocations(data);
+                displayMarkers(locReadyForDisplay);
             });
         }
 
     });
 });
 
+function deserializeLocations(locations) {
+    if (locations != null && locations != "") {
+        try {
+            locReadyForDisplay = JSON.parse(locations);
+            return locReadyForDisplay;
+            }
+            catch (ex) {
+                console.error(ex);
+                return [];
+            }
+    }
+return [];
+}
+
+function clearOverlays() {
+  for (var i = 0; i < allMarkers.length; i++) {
+    allMarkers[i].setMap(null);
+    }
+  allMarkers.length = 0;
+}
+
 function displayMarkers(locations) {
+    clearOverlays();
     var latitude = $('.latitude').attr('title');
     var longitude = $('.longitude').attr('title');
     var latLng = {
         lat: parseFloat(latitude), lng: parseFloat(longitude)
     }
-    var map = new google.maps.Map(document.getElementById('map'), {
-        zoom: 7,
-        center: latLng
-    });
-
 
     $.each(locations, function (key, location) {
         addMarker(location, map);
@@ -93,7 +113,8 @@ function addMarker(location, map) {
     var marker = new google.maps.Marker({
         position: latLng,
         map: map,
-        title: location.name
+        title: location.name,
+
     });
     marker.set("location", location);
 
@@ -103,16 +124,17 @@ function addMarker(location, map) {
         html = getLocationDetails(loc);
         insertHTML("locationDetails", html);
     });
+    allMarkers.push(marker);
 }
 
 function getLocationDetails(location) {
     html = "<h4>" + location.name + "</h4>";
     var loc = JSON.stringify(location);
     html += getHtmlForCheckBoxes(loc);
-
+    html += "<br/>"
     $.each(location.attributes, function (key, detail) {
         if (detail.Type == "string" || detail.Type == "number") {
-            html += "<p><b>" + detail.Name + "</b></p>" + "<p>" + detail.Value + "</p>";
+            html += "<div><b>" + detail.Name + "</b>: "  + detail.Value + "</div>";
         }
         else if (detail.Type == "bool") {
             html += "<input type='checkbox' name='" + detail.Name + "' ";

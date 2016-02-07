@@ -60,8 +60,6 @@ namespace BaprAPI.Utils
                         @value = @value.Remove(index);
                     }
 
-                   if (attr.Trim() == "s") { }
-                   else
                     if (attr.Trim() == "lat")
                     {
                         baprLocation.latitude = Convert.ToDouble(@value);
@@ -85,8 +83,8 @@ namespace BaprAPI.Utils
                         baprLocation.attributes.Add(new BaprLocationAttribute
                         {
                             Name = attr,
-                            Value = @value,
-                            Type ="string"
+                            Value = attr.Trim() == "wheelchair" ? "True" : @value,
+                            Type = attr.Trim() == "wheelchair" ? "bool" : "string"
                         });
 
                     }

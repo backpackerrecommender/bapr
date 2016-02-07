@@ -27,7 +27,7 @@ namespace BaprAPI.Controllers
         public ICollection<BaprLocation> GetFromDbpedia(string text, double latitude, double longitude, IUserPreference userPreference)
         {
             var cuisineFromDb = BaprAPI.Utils.Utils.GetCuisines(userPreference, true);
-            string searchQueryByText = "SELECT DISTINCT * WHERE{\n"
+            string searchQueryByText = "SELECT DISTINCT ?lat ?long ?name ?address ?cuisine ?website WHERE{\n"
               + "?s a dbo:Location .\n"
               + "?s geo:lat ?lat .\n"
               + "?s geo:long ?long .\n"
@@ -73,7 +73,7 @@ namespace BaprAPI.Controllers
         public ICollection<BaprLocation> GetFromLinkedGeoData(string text, double latitude, double longitude, IUserPreference userPreference)
         {
             var cuisine = BaprAPI.Utils.Utils.GetCuisines(userPreference, false);
-            string searchQueryByText = "SELECT DISTINCT * WHERE {\n"
+            string searchQueryByText = "SELECT DISTINCT ?lat ?long ?name ?website ?cuisine ?address ?opening_hours ?wheelchair WHERE {\n"
                 + "?s geo:lat ?lat .\n"
                 + "?s geo:long ?long .\n"
                 + "?s rdfs:label ?name. \n"
@@ -82,6 +82,8 @@ namespace BaprAPI.Controllers
                 + "OPTIONAL { ?s lgd:cuisine ?cuisine .}\n"
                 + "OPTIONAL { ?s lgd:address ?address .}\n "
                 + "OPTIONAL { ?s lgd:opening_hours  ?opening_hours .}\n "
+                + (userPreference.NeedMedicalSupport ? "?s lgd:wheelchair ?wheelchair. FILTER (?wheelchair =" + BaprAPI.Models.Constants.xsdBooleanIsTrue + ")\n"
+                                                      : " OPTIONAL {?s lgd:wheelchair ?wheelchair.} \n")
                 + "FILTER (langMatches(lang(?name ), \"en\") \n"
                 + " && ?lat > " + latitude + " - 1 && ?lat < " + latitude + " + 1 "
                 + " && ?long > " + longitude + " - 1 && ?long < " + longitude + " + 1 \n"

@@ -87,8 +87,8 @@ namespace Bapr.Controllers
                     HttpResponseMessage response = client.GetAsync(urlParam).Result;
                     if (response.IsSuccessStatusCode)
                     {
-                        var x = response.Content.ReadAsStringAsync().Result;
-                        return Json(x, JsonRequestBehavior.AllowGet);
+                        var result = response.Content.ReadAsStringAsync().Result;
+                        return Json(result, JsonRequestBehavior.AllowGet);
                     }
                 }
             }
@@ -131,7 +131,7 @@ namespace Bapr.Controllers
             var urlParam = "?lat=" + latitude + "&lng=" + longitude + "&userEmail=" + userEmail;
             HttpResponseMessage response = client.GetAsync(urlParam).Result;
             var result = response.Content.ReadAsStringAsync().Result;
-            return Json(new { }, JsonRequestBehavior.AllowGet);
+            return Json(result, JsonRequestBehavior.AllowGet);
         }
 
         public ActionResult MarkLocation(Location location, string type)
