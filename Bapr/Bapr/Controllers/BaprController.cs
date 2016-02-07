@@ -125,13 +125,18 @@ namespace Bapr.Controllers
                     client.BaseAddress = new Uri("http://localhost:18323/api/Museums/GetHospitalsNearby");
                     break;
             }
-       
-          
+           
+            
             var userEmail = GetUserEmail();
             var urlParam = "?lat=" + latitude + "&lng=" + longitude + "&userEmail=" + userEmail;
             HttpResponseMessage response = client.GetAsync(urlParam).Result;
-            var result = response.Content.ReadAsStringAsync().Result;
-            return Json(result, JsonRequestBehavior.AllowGet);
+            
+            if (response.IsSuccessStatusCode)
+            {
+                var result = response.Content.ReadAsStringAsync().Result;
+                return Json(result, JsonRequestBehavior.AllowGet);
+            }
+            return Json(new { }, JsonRequestBehavior.AllowGet);
         }
 
         public ActionResult MarkLocation(Location location, string type)

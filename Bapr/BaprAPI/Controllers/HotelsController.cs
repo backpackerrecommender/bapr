@@ -91,7 +91,7 @@ namespace BaprAPI.Controllers
                 + " OPTIONAL {?s lgd:rooms ?rooms.} \n"
                 + " OPTIONAL {?s lgd:internet_access ?internet_access.} \n"
                 + " OPTIONAL {?s lgd:opening_hours ?opening_hours.} \n"
-                + (userPreference.NeedMedicalSupport ? "?s lgd:wheelchair ?wheelchair. FILTER (?wheelchair =" + BaprAPI.Models.Constants.xsdBooleanIsTrue + ")\n"
+                + (userPreference.NeedWheelchair ? "?s lgd:wheelchair ?wheelchair. FILTER (?wheelchair =" + BaprAPI.Models.Constants.xsdBooleanIsTrue + ")\n"
                                                       : " OPTIONAL {?s lgd:wheelchair ?wheelchair.} \n")
                 + " OPTIONAL {?s lgd:stars ?stars. } \n"
                 + " OPTIONAL {?s lgd:operator ?operator. } \n"

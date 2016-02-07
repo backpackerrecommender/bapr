@@ -33,7 +33,7 @@ namespace BaprAPI.Utils
             var cuisines = userPreference.Cuisine.Where(c => c.Checked == true).Select(c => c.Name.ToLower());
             foreach (var cuisine in cuisines)
             {
-                result = result + "\"" + cuisine + "\"" + (addXsdSTring ? Constants.xsdString.ToLower()  : string.Empty) +",";
+                result = result + "\"" + cuisine + "\"" + (addXsdSTring ? Constants.xsdString : string.Empty) + ",";
             }
             result = !string.IsNullOrEmpty(result) ? result.Remove(result.Length - 1) : result;
             return result;
@@ -60,6 +60,12 @@ namespace BaprAPI.Utils
                         @value = @value.Remove(index);
                     }
 
+                    if (attr.Trim() == "head_chef")
+                    {
+                        string decodedUrlValue = HttpUtility.UrlDecode(@value);
+                        var headChef = decodedUrlValue.Substring(decodedUrlValue.LastIndexOf('/') + 1);
+                        @value = headChef;
+                    }
                     if (attr.Trim() == "lat")
                     {
                         baprLocation.latitude = Convert.ToDouble(@value);
@@ -80,6 +86,10 @@ namespace BaprAPI.Utils
                    
                     else if (!string.IsNullOrWhiteSpace(@value))
                     {
+                        @value = @value.Trim();
+                        var indexForName = @value.IndexOf('@');
+                        if (indexForName == @value.Length - 3)
+                            @value = @value.Remove(indexForName);
                         baprLocation.attributes.Add(new BaprLocationAttribute
                         {
                             Name = attr,

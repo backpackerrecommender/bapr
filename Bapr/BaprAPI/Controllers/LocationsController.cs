@@ -85,7 +85,7 @@ namespace BaprAPI.Controllers
                 + "OPTIONAL { ?s lgd:cuisine ?cuisine .}\n"
                 + "OPTIONAL { ?s lgd:address ?address .}\n "
                 + "OPTIONAL { ?s lgd:opening_hours  ?opening_hours .}\n "
-                + (userPreference.NeedMedicalSupport ? "?s lgd:wheelchair ?wheelchair. FILTER (?wheelchair =" + BaprAPI.Models.Constants.xsdBooleanIsTrue + ")\n"
+                + (userPreference.NeedWheelchair ? "?s lgd:wheelchair ?wheelchair. FILTER (?wheelchair =" + BaprAPI.Models.Constants.xsdBooleanIsTrue + ")\n"
                                                       : " OPTIONAL {?s lgd:wheelchair ?wheelchair.} \n")
                 + "FILTER (langMatches(lang(?name ), \"en\") \n"
                 + " && ?lat > " + latitude + " - 1 && ?lat < " + latitude + " + 1 "

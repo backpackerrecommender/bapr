@@ -341,10 +341,10 @@ namespace BaprAPI.Models
             		set { SetRelatedProperty("NoOfDays", value); }
     	}
     
-    	public System.Boolean NeedMedicalSupport
+    	public System.Boolean NeedWheelchair
     	{
-            		get { return GetRelatedProperty<System.Boolean>("NeedMedicalSupport"); }
-            		set { SetRelatedProperty("NeedMedicalSupport", value); }
+            		get { return GetRelatedProperty<System.Boolean>("NeedWheelchair"); }
+            		set { SetRelatedProperty("NeedWheelchair", value); }
     	}
     	#endregion
     }

@@ -53,7 +53,7 @@ namespace BaprAPI.Controllers
                 userPreference.Cuisine = cuisineCollection;
 
                 userPreference.MaxBudget = userPreferencesModel.MaxBudget;
-                userPreference.NeedMedicalSupport = userPreferencesModel.NeedMedicalSupport;
+                userPreference.NeedWheelchair = userPreferencesModel.NeedWheelchair;
                 userPreference.NoOfDays = userPreferencesModel.NoOfDays;
 
                 var currentUser = ctx.Users.FirstOrDefault(x => x.Email == user);
@@ -93,7 +93,7 @@ namespace BaprAPI.Controllers
 
                     usrPreference = new UserPreferenceModel()
                     {
-                        NeedMedicalSupport = currentUser.UserPreference.NeedMedicalSupport,
+                        NeedWheelchair = currentUser.UserPreference.NeedWheelchair,
                         Cuisine = cuisineCollection,
                         Interests = interestsCollection,
                         NoOfDays = currentUser.UserPreference.NoOfDays,
