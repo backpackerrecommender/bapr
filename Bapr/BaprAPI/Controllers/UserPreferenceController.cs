@@ -52,9 +52,7 @@ namespace BaprAPI.Controllers
                 ICollection<IInterest> cuisineCollection = cuisineList;
                 userPreference.Cuisine = cuisineCollection;
 
-                userPreference.MaxBudget = userPreferencesModel.MaxBudget;
                 userPreference.NeedWheelchair = userPreferencesModel.NeedWheelchair;
-                userPreference.NoOfDays = userPreferencesModel.NoOfDays;
 
                 var currentUser = ctx.Users.FirstOrDefault(x => x.Email == user);
                 IUserPreference usrPreferences = userPreference;
@@ -96,8 +94,6 @@ namespace BaprAPI.Controllers
                         NeedWheelchair = currentUser.UserPreference.NeedWheelchair,
                         Cuisine = cuisineCollection,
                         Interests = interestsCollection,
-                        NoOfDays = currentUser.UserPreference.NoOfDays,
-                        MaxBudget = currentUser.UserPreference.MaxBudget
                     };
                 }
                 var json = JsonConvert.SerializeObject(usrPreference,

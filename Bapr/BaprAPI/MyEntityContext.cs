@@ -329,18 +329,6 @@ namespace BaprAPI.Models
     		set { if (value == null) throw new ArgumentNullException("value"); SetRelatedObjects("Cuisine", value); }
     								}
     
-    	public System.Int64 MaxBudget
-    	{
-            		get { return GetRelatedProperty<System.Int64>("MaxBudget"); }
-            		set { SetRelatedProperty("MaxBudget", value); }
-    	}
-    
-    	public System.Int32 NoOfDays
-    	{
-            		get { return GetRelatedProperty<System.Int32>("NoOfDays"); }
-            		set { SetRelatedProperty("NoOfDays", value); }
-    	}
-    
     	public System.Boolean NeedWheelchair
     	{
             		get { return GetRelatedProperty<System.Boolean>("NeedWheelchair"); }

@@ -24,8 +24,6 @@ namespace Bapr.Models
 
     public class UserPreference
     {
-        public long MaxBudget { get; set; }
-        public int NoOfDays { get; set; }
         public bool NeedWheelchair { get; set; }
         public ICollection<Interest> Interests { get; set; }
         public ICollection<Interest> Cuisine { get; set; }

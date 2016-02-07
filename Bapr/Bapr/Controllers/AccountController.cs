@@ -33,9 +33,11 @@ namespace Bapr.Controllers
             result.Interests.Add(new Interest() { Checked = false, Name = "Shopping" });
 
             result.Cuisine = new Collection<Interest>();
+            result.Cuisine.Add(new Interest() { Checked = false, Name = "American" });
             result.Cuisine.Add(new Interest() { Checked = false, Name = "Asian" });
             result.Cuisine.Add(new Interest() { Checked = false, Name = "Chinese" });
             result.Cuisine.Add(new Interest() { Checked = false, Name = "French" });
+            result.Cuisine.Add(new Interest() { Checked = false, Name = "Greek" });
             result.Cuisine.Add(new Interest() { Checked = false, Name = "Indian" });
             result.Cuisine.Add(new Interest() { Checked = false, Name = "Italian" });
             result.Cuisine.Add(new Interest() { Checked = false, Name = "Japanese" });
@@ -116,9 +118,11 @@ namespace Bapr.Controllers
 
             result.Cuisine = new Collection<Interest>();
             result.SelectedCuisine = result.SelectedCuisine != null ? result.SelectedCuisine : new Collection<string>();
+            result.Cuisine.Add(new Interest() { Checked = result.SelectedCuisine.Contains("American"), Name = "American" });
             result.Cuisine.Add(new Interest() { Checked = result.SelectedCuisine.Contains("Asian"), Name = "Asian" });
             result.Cuisine.Add(new Interest() { Checked = result.SelectedCuisine.Contains("Chinese"), Name = "Chinese" });
             result.Cuisine.Add(new Interest() { Checked = result.SelectedCuisine.Contains("French"), Name = "French" });
+            result.Cuisine.Add(new Interest() { Checked = result.SelectedCuisine.Contains("Greek"), Name = "Greek" });
             result.Cuisine.Add(new Interest() { Checked = result.SelectedCuisine.Contains("Indian"), Name = "Indian" });
             result.Cuisine.Add(new Interest() { Checked = result.SelectedCuisine.Contains("Italian"), Name = "Italian" });
             result.Cuisine.Add(new Interest() { Checked = result.SelectedCuisine.Contains("Japanese"), Name = "Japanese" });

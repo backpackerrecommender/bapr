@@ -12,23 +12,6 @@
 
     <div class="form-horizontal">
 
-        @Html.ValidationSummary(true)
-        <div class="form-group">
-            @Html.LabelFor(model => model.MaxBudget, new { @class = "control-label col-md-2" })
-            <div class="col-md-10">
-                @Html.EditorFor(model => model.MaxBudget, additionalViewData: new { htmlAttributes = new { min = 1, max = long.MaxValue } })
-                @Html.ValidationMessageFor(model => model.MaxBudget)
-            </div>
-        </div>
-
-        <div class="form-group">
-            @Html.LabelFor(model => model.NoOfDays, new { @class = "control-label col-md-2" })
-            <div class="col-md-10">
-                @Html.EditorFor(model => model.NoOfDays, additionalViewData: new { htmlAttributes = new { min = 1, max = Int32.MaxValue} })
-                @Html.ValidationMessageFor(model => model.NoOfDays)
-            </div>
-        </div>
-
         <div class="form-group">
             @Html.LabelFor(model => model.NeedWheelchair, new { @class = "control-label col-md-2" })
             <div class="col-md-10">
