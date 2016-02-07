@@ -111,7 +111,7 @@ namespace Bapr.Controllers
                     client.BaseAddress = new Uri("http://localhost:18323/api/Museums/GetMuseumsNearby");
                     break;
                 case PlaceCategory.Hospitals:
-                    client.BaseAddress = new Uri("http://localhost:18323/api/Hospitals/GetHospitalsNearby");
+                    client.BaseAddress = new Uri("http://localhost:18323/api/Hospitals/GetAllHospitalsNearby");
                     break;
                 case PlaceCategory.Hotels:
                     client.BaseAddress = new Uri("http://localhost:18323/api/Hotels/GetByCoordinates");
@@ -123,10 +123,9 @@ namespace Bapr.Controllers
                     client.BaseAddress = new Uri("http://localhost:18323/api/Shops/GetShopsNearby");
                     break;
                 default:
-                    client.BaseAddress = new Uri("http://localhost:18323/api/Museums/GetHospitalsNearby");
+                    client.BaseAddress = new Uri("http://localhost:18323/api/Museums/GetAllHospitalsNearby");
                     break;
             }
-
 
             var userEmail = GetUserEmail();
             var urlParam = "?lat=" + latitude + "&lng=" + longitude + "&userEmail=" + userEmail;

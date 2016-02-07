@@ -45,8 +45,8 @@ namespace BaprAPI.Controllers
                                 "Optional { ?f dbp:headChef ?head_chef .} \n" +
                                 "Optional { ?f dbp:reservations ?reservations .} \n" +
                                 " FILTER ( langMatches(lang(?name), \"EN\")\n" +
-                                " && ?lat > " + lat + " - 1 && ?lat < " + lat + " + 1\n" +
-                                " && ?long > " + lng + " - 1 && ?long < " + lng + " + 1\n" +
+                                " && ?lat > " + lat + " - 0.5 && ?lat < " + lat + " + 0.5\n" +
+                                " && ?long > " + lng + " - 0.5 && ?long < " + lng + " + 0.5\n" +
                                 (!string.IsNullOrEmpty(cuisine) ? " && lcase(?cuisine) in (" + cuisine + ") " : string.Empty) +
                                 ")}\n" +"LIMIT 30";
 
@@ -61,28 +61,8 @@ namespace BaprAPI.Controllers
             queryString.Namespaces.AddNamespace("foaf", new Uri("http://xmlns.com/foaf/0.1/"));
             queryString.CommandText = queryRestaurantsDBpedia;
 
-            SparqlQueryParser parser = new SparqlQueryParser();
-            SparqlQuery query = parser.ParseFromString(queryString);
-
-            Uri uri = new Uri(@"http://dbpedia.org/sparql");
-
-            TripleStore tripleStore = new TripleStore();
-            IRdfHandler rdfHandler = new StoreHandler(tripleStore);
-
-            SparqlResultSet resultSet = new SparqlResultSet();
-            ISparqlResultsHandler resultsHandler = new ResultSetHandler(resultSet);
-            //Get the Query processor
-            SparqlRemoteEndpoint endPoint = new SparqlRemoteEndpoint(uri);
-            ISparqlQueryProcessor processor = new RemoteQueryProcessor(endPoint);
-            object result = processor.ProcessQuery(query);
+            return BaprAPI.Utils.Utils.ParseSparqlQuery(queryString, @"http://dbpedia.org/sparql");
            
-            if (result is SparqlResultSet)
-            {
-                SparqlResultSet entities = (SparqlResultSet)result;
-                return BaprAPI.Utils.Utils.ConvertFromSparqlSetToBaprLocations(entities);
-            }
-
-            return new Collection<BaprLocation>();
         }
 
         public Collection<BaprLocation> Linkedgeodata_GetRestaurantsNearby(double lat, double lng, IUserPreference userPreference)
@@ -106,8 +86,8 @@ namespace BaprAPI.Controllers
                                 (userPreference.NeedWheelchair ? "?f lgdo:wheelchair ?wheelchair. FILTER (?wheelchair =" + BaprAPI.Models.Constants.xsdBooleanIsTrue + ")\n"
                                                       : " OPTIONAL {?f lgdo:wheelchair ?wheelchair.} \n")+
                                 " FILTER ( langMatches(lang(?name), \"EN\")\n" +
-                                " && ?lat > " + lat + " - 1 && ?lat < " + lat + " + 1\n" +
-                                " && ?long > " + lng + " - 1 && ?long < " + lng + " + 1" +
+                                " && ?lat > " + lat + " - 0.5 && ?lat < " + lat + " + 0.5\n" +
+                                " && ?long > " + lng + " - 0.5 && ?long < " + lng + " + 0.5" +
                                 (!string.IsNullOrEmpty(cuisine) ? "&& lcase(?cuisine) in (" + cuisine + ") \n" : string.Empty) +
                                  ")}\n" +
                                 "LIMIT 30";
@@ -122,28 +102,8 @@ namespace BaprAPI.Controllers
             queryString.Namespaces.AddNamespace("foaf", new Uri("http://xmlns.com/foaf/0.1/"));
             queryString.CommandText = queryRestaurantsLinkedgeodata;
 
-            SparqlQueryParser parser = new SparqlQueryParser();
-            SparqlQuery query = parser.ParseFromString(queryString);
-
-            Uri uri = new Uri(@"http://linkedgeodata.org/sparql");
-
-            TripleStore tripleStore = new TripleStore();
-            IRdfHandler rdfHandler = new StoreHandler(tripleStore);
-
-            SparqlResultSet resultSet = new SparqlResultSet();
-            ISparqlResultsHandler resultsHandler = new ResultSetHandler(resultSet);
-            //Get the Query processor
-            SparqlRemoteEndpoint endPoint = new SparqlRemoteEndpoint(uri);
-            ISparqlQueryProcessor processor = new RemoteQueryProcessor(endPoint);
-            object result = processor.ProcessQuery(query);
-
-            if (result is SparqlResultSet)
-            {
-                SparqlResultSet entities = (SparqlResultSet)result;
-                return BaprAPI.Utils.Utils.ConvertFromSparqlSetToBaprLocations(entities);
-            }
-
-            return new Collection<BaprLocation>();
+            return BaprAPI.Utils.Utils.ParseSparqlQuery(queryString, @"http://linkedgeodata.org/sparql");
+           
         }
     }
 }

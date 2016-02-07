@@ -23,28 +23,28 @@ namespace BaprAPI.Controllers
             var userPreference = BaprAPI.Utils.Utils.GetUserPreference(userEmail);
             var fromDbPedia = DbPedia_GetMuseumsNearby(lat, lng, userPreference);
             var fromLinkedGeoData = LinkedGeoData_GetMuseumsNearby(lat, lng, userPreference);
-            return new HttpResponseMessage(HttpStatusCode.OK);//200
+            var allLocations = fromDbPedia.Concat(fromLinkedGeoData);
+            return Request.CreateResponse(HttpStatusCode.OK, allLocations);
+            
         }
         private Collection<BaprLocation> DbPedia_GetMuseumsNearby(double lat, double lng, IUserPreference userPreference)
-        {                                  
-            string myQuery = "SELECT DISTINCT ?name ?website ?address ?phone ?lat ?long \n" +
-                            "WHERE {	\n" + 
-                            "?museum a ?type. \n" +
-                            "?museum ?p ?name. \n" +
-                            "Optional { ?museum dbpproperty:address ?address. }" +
-                            "Optional { ?museum dbpproperty:website ?website. }\n" +
-                            "Optional { ?museum foaf:phone ?phone. }" +
-                            "?museum geo:lat ?lat.\n" +
-                            "?museum geo:long ?long.\n" +
-                            "FILTER (?p=<http://www.w3.org/2000/01/rdf-schema#label>).\n" +
-                            "FILTER (?type IN (<http://dbpedia.org/ontology/Museum>, <http://schema.org/Museum>, <http://dbpedia.org/class/yago/Museum103800563>)).\n" +
-                            "FILTER ( ?long > " + lng + " - 1 && ?long < " + lng + " + 1 && \n" +
-                            "?lat > " + lat + " - 1 && ?lat < " + lat + " + 1)\n" +
-                            "FILTER ( lang(?name) = 'en')}\n" + 
-                          //"FILTER ( regex(str(?category),"Computer","i") ||
-                                   //regex(str(?type),"Computer","i") ||
-                                   //regex(str(?abstract),"Computer ","i"))." +
-                            "LIMIT 30";
+        {
+            string myQuery = "SELECT DISTINCT ?name ?website ?address ?phone ?lat ?long  ?comment \n" +
+                           "WHERE {	\n" +
+                           "?museum a ?type. \n" +
+                           "?museum ?p ?name. \n" +
+                           "Optional { ?museum dbpproperty:address ?address. }" +
+                           "Optional { ?museum dbpproperty:website ?website. }\n" +
+                           "Optional { ?museum foaf:phone ?phone. }" +
+                           "Optional { ?s rdfs:comment ?comment. FILTER(langMatches(lang(?comment ), \"en\"))}\n" +
+                           "?museum geo:lat ?lat.\n" +
+                           "?museum geo:long ?long.\n" +
+                           "FILTER (?p=<http://www.w3.org/2000/01/rdf-schema#label>).\n" +
+                           "FILTER (?type IN (<http://dbpedia.org/ontology/Museum>, <http://schema.org/Museum>, <http://dbpedia.org/class/yago/Museum103800563>)).\n" +
+                           "FILTER ( ?long > " + lng + " - 0.5 && ?long < " + lng + " + 0.5 && \n" +
+                           "?lat > " + lat + " - 0.5 && ?lat < " + lat + " + 0.5)\n" +
+                           "FILTER ( lang(?name) = 'en')}\n" +
+                           "LIMIT 30";
 
             SparqlParameterizedString dbpediaQuery = new SparqlParameterizedString();
 
@@ -52,18 +52,11 @@ namespace BaprAPI.Controllers
             dbpediaQuery.Namespaces.AddNamespace("dbpedia-owl", new Uri("http://dbpedia.org/ontology/"));
             dbpediaQuery.Namespaces.AddNamespace("dbpproperty", new Uri("http://dbpedia.org/property/"));
             dbpediaQuery.Namespaces.AddNamespace("foaf", new Uri("http://xmlns.com/foaf/spec/"));
+            dbpediaQuery.Namespaces.AddNamespace("rdf", new Uri("http://www.w3.org/1999/02/22-rdf-syntax-ns#"));
+            dbpediaQuery.Namespaces.AddNamespace("rdfs", new Uri("http://www.w3.org/2000/01/rdf-schema#"));
             dbpediaQuery.CommandText = myQuery;
 
-            SparqlQueryParser parser = new SparqlQueryParser();
-            SparqlQuery query = parser.ParseFromString(dbpediaQuery);
-            Uri uri = new Uri(@"http://dbpedia.org/sparql");
-            SparqlResultSet resultSet = new SparqlResultSet();
-            ISparqlResultsHandler resultsHandler = new ResultSetHandler(resultSet);
-            SparqlRemoteEndpoint endPoint = new SparqlRemoteEndpoint(uri);
-            ISparqlQueryProcessor processor = new RemoteQueryProcessor(endPoint);
-
-            SparqlResultSet result = (SparqlResultSet)processor.ProcessQuery(query);
-            return BaprAPI.Utils.Utils.ConvertFromSparqlSetToBaprLocations(result);
+            return BaprAPI.Utils.Utils.ParseSparqlQuery(dbpediaQuery, @"http://dbpedia.org/sparql");
         }
 
         private Collection<BaprLocation> LinkedGeoData_GetMuseumsNearby(double lat, double lng, IUserPreference userPreference) 
@@ -79,8 +72,8 @@ namespace BaprAPI.Controllers
                             "?museum geo:long ?long.\n" +
                             "FILTER (?p=<http://www.w3.org/2000/01/rdf-schema#label>).\n" +
                             "FILTER (?type IN (<http://linkedgeodata.org/ontology/Museum>, <http://schema.org/Museum>)).\n" +
-                            "FILTER ( ?long > " + lng + " - 1 && ?long < " + lng + " + 1 && \n" +
-                            "?lat > " + lat + " - 1 && ?lat < " + lat + " + 1)}\n" +
+                            "FILTER ( ?long > " + lng + " - 0.5 && ?long < " + lng + " + 0.5 && \n" +
+                            "?lat > " + lat + " - 0.5 && ?lat < " + lat + " + 0.5)}\n" +
                             "LIMIT 30";
 
             SparqlParameterizedString dbpediaQuery = new SparqlParameterizedString();
@@ -90,16 +83,7 @@ namespace BaprAPI.Controllers
             dbpediaQuery.Namespaces.AddNamespace("foaf", new Uri("http://xmlns.com/foaf/spec/"));
             dbpediaQuery.CommandText = myQuery;
 
-            SparqlQueryParser parser = new SparqlQueryParser();
-            SparqlQuery query = parser.ParseFromString(dbpediaQuery);
-            Uri uri = new Uri(@"http://linkedgeodata.org/sparql");
-            SparqlResultSet resultSet = new SparqlResultSet();
-            ISparqlResultsHandler resultsHandler = new ResultSetHandler(resultSet);
-            SparqlRemoteEndpoint endPoint = new SparqlRemoteEndpoint(uri);
-            ISparqlQueryProcessor processor = new RemoteQueryProcessor(endPoint);
-
-            SparqlResultSet result = (SparqlResultSet)processor.ProcessQuery(query);
-            return BaprAPI.Utils.Utils.ConvertFromSparqlSetToBaprLocations(result);
+            return BaprAPI.Utils.Utils.ParseSparqlQuery(dbpediaQuery, @"http://linkedgeodata.org/sparql");
         }
     }
 }

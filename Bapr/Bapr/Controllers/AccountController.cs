@@ -23,7 +23,8 @@ namespace Bapr.Controllers
         {
             var result = new UserPreference();
             result.Interests = new Collection<Interest>();
-            result.Interests.Add(new Interest() { Checked = false, Name = "Archeology" });
+            result.Interests.Add(new Interest() { Checked = false, Name = "Archaeology" });
+            result.Interests.Add(new Interest() { Checked = false, Name = "Astronomy" });
             result.Interests.Add(new Interest() { Checked = false, Name = "Cuisine" });
             result.Interests.Add(new Interest() { Checked = false, Name = "Dancing" });
             result.Interests.Add(new Interest() { Checked = false, Name = "Geography" });
@@ -101,7 +102,8 @@ namespace Bapr.Controllers
         {
             result.Interests = new Collection<Interest>();
             result.SelectedInterests = result.SelectedInterests != null ? result.SelectedInterests : new Collection<string>();
-            result.Interests.Add(new Interest() { Checked = result.SelectedInterests.Contains("Archeology"), Name = "Archeology" });
+            result.Interests.Add(new Interest() { Checked = result.SelectedInterests.Contains("Archaeology"), Name = "Archaeology" });
+            result.Interests.Add(new Interest() { Checked = result.SelectedInterests.Contains("Astronomy"), Name = "Astronomy" });
             result.Interests.Add(new Interest() { Checked = result.SelectedInterests.Contains("Cuisine"), Name = "Cuisine" });
             result.Interests.Add(new Interest() { Checked = result.SelectedInterests.Contains("Dancing"), Name = "Dancing" });
             result.Interests.Add(new Interest() { Checked = result.SelectedInterests.Contains("Geography"), Name = "Geography" });

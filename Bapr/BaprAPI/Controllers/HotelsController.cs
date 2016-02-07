@@ -36,21 +36,25 @@ namespace BaprAPI.Controllers
 
         private Collection<BaprLocation> GetFromDbpedia(double latitude, double longitude, IUserPreference userPreference)
         {
-            string searchHotelsQuery = "SELECT DISTINCT ?lat ?long ?name ?website ?address ?number_of_restaurants ?star_rating ?number_of_rooms ?number_of_suites"
-                                 +" WHERE {\n ?s a dbo:Hotel ."
-                                 + "?s rdfs:label ?name .\n"
-                                 + "?s geo:lat ?lat .\n"
-                                 + "?s geo:long ?long .\n"
-                                 + "OPTIONAL { ?s foaf:homepage ?website .}\n"
-                                 + "OPTIONAL { ?s dbo:address ?address .}\n"
-                                 + "OPTIONAL { ?s dbp:numberOfRestaurants ?number_of_restaurants.} \n"
-                                 + "OPTIONAL { ?s dbp:starRating  ?star_rating. } \n"
-                                 + "OPTIONAL { ?s dbp:numberOfRooms ?number_of_rooms. } \n"
-                                 + "OPTIONAL { ?s  dbp:numberOfSuites ?number_of_suites. } \n"
-                                 + "FILTER ( langMatches(lang(?name), \"EN\")"
-                                 + " && ?lat > " + latitude + " - 1  && ?lat < " + latitude  + " + 1"
-                                 + " && ?long > " + longitude + " - 1 && ?long < " + longitude  + " + 1 )\n"
-                                 + " } LIMIT 10";
+            string searchHotelsQuery = "SELECT DISTINCT ?lat ?long ?name ?website ?address ?number_of_restaurants "
+               + "?star_rating ?number_of_rooms ?number_of_suites ?comment ?arhitect ?chain "
+                                + " WHERE {\n ?s a dbo:Hotel ."
+                                + "?s rdfs:label ?name .\n"
+                                + "?s geo:lat ?lat .\n"
+                                + "?s geo:long ?long .\n"
+                                + "OPTIONAL { ?s rdfs:comment ?comment. FILTER(langMatches(lang(?comment ), \"en\"))}\n"
+                                + "OPTIONAL { ?s dbo:arhitect ?arhitect. }\n"
+                                + "OPTIONAL { ?s dbp:chain ?chain. }\n"
+                                + "OPTIONAL { ?s foaf:homepage ?website .}\n"
+                                + "OPTIONAL { ?s dbo:address ?address .}\n"
+                                + "OPTIONAL { ?s dbp:numberOfRestaurants ?number_of_restaurants.} \n"
+                                + "OPTIONAL { ?s dbp:starRating  ?star_rating. } \n"
+                                + "OPTIONAL { ?s dbp:numberOfRooms ?number_of_rooms. } \n"
+                                + "OPTIONAL { ?s  dbp:numberOfSuites ?number_of_suites. } \n"
+                                + "FILTER ( langMatches(lang(?name), \"EN\")"
+                                + " && ?lat > " + latitude + " - 0.5  && ?lat < " + latitude + " + 0.5"
+                                + " && ?long > " + longitude + " - 0.5 && ?long < " + longitude + " + 0.5 )\n"
+                                + " } LIMIT 10";
 
 
             SparqlParameterizedString sparqlQueryString = new SparqlParameterizedString();
@@ -62,32 +66,21 @@ namespace BaprAPI.Controllers
             sparqlQueryString.Namespaces.AddNamespace("foaf", new Uri("http://xmlns.com/foaf/0.1/"));
             sparqlQueryString.CommandText = searchHotelsQuery;
 
-            SparqlQueryParser parser = new SparqlQueryParser();
-            SparqlQuery query = parser.ParseFromString(sparqlQueryString);
+            return BaprAPI.Utils.Utils.ParseSparqlQuery(sparqlQueryString, @"http://dbpedia.org/sparql");
 
-            Uri uri = new Uri(@"http://dbpedia.org/sparql");
-            SparqlRemoteEndpoint endPoint = new SparqlRemoteEndpoint(uri);
-            ISparqlQueryProcessor processor = new RemoteQueryProcessor(endPoint);
-            object queryResult = processor.ProcessQuery(query);
-            if (queryResult is SparqlResultSet)
-            {
-                SparqlResultSet entities = (SparqlResultSet)queryResult;
-                return BaprAPI.Utils.Utils.ConvertFromSparqlSetToBaprLocations(entities);
-            }
-            return new Collection<BaprLocation>();
         }
         private Collection<BaprLocation> GetFromLinkedGeoData(double latitude, double longitude, IUserPreference userPreference)
         {
 
             string searchHotelsQuery = "SELECT DISTINCT ?lat ?long ?name ?website ?phone ?address ?rooms ?internet_acces"
-                +" ?opening_hours ?wheelchair ?stars ?operator"
+                + " ?opening_hours ?wheelchair ?stars ?operator"
                 + " WHERE { ?s a lgd:Hotel .\n"
                 + " ?s rdfs:label ?name . \n"
                 + " ?s geo:lat ?lat .\n"
                 + " ?s geo:long ?long . \n"
                 + "OPTIONAL {?s foaf:homepage ?website .}\n"
                 + "OPTIONAL {?s foaf:phone ?phone. }\n"
-                + " OPTIONAL {?s lgd:address ?address .}\n " 
+                + " OPTIONAL {?s lgd:address ?address .}\n "
                 + " OPTIONAL {?s lgd:rooms ?rooms.} \n"
                 + " OPTIONAL {?s lgd:internet_access ?internet_access.} \n"
                 + " OPTIONAL {?s lgd:opening_hours ?opening_hours.} \n"
@@ -95,8 +88,8 @@ namespace BaprAPI.Controllers
                                                       : " OPTIONAL {?s lgd:wheelchair ?wheelchair.} \n")
                 + " OPTIONAL {?s lgd:stars ?stars. } \n"
                 + " OPTIONAL {?s lgd:operator ?operator. } \n"
-                + " FILTER ( ?lat > " + latitude + " - 1  && ?lat < " + latitude + " + 1"
-                + " && ?long > " + longitude + " - 1 && ?long < " + longitude + " + 1 )\n"
+                + " FILTER ( ?lat > " + latitude + " - 0.5  && ?lat < " + latitude + " + 0.5"
+                + " && ?long > " + longitude + " - 0.5 && ?long < " + longitude + " + 0.5 )\n"
                 + "} LIMIT 10";
 
             SparqlParameterizedString sparqlQueryString = new SparqlParameterizedString();
@@ -107,20 +100,7 @@ namespace BaprAPI.Controllers
             sparqlQueryString.Namespaces.AddNamespace("foaf", new Uri("http://xmlns.com/foaf/0.1/"));
             sparqlQueryString.CommandText = searchHotelsQuery;
 
-            SparqlQueryParser parser = new SparqlQueryParser();
-            SparqlQuery query = parser.ParseFromString(sparqlQueryString);
-
-            Uri uri = new Uri(@"http://linkedgeodata.org/sparql");
-            SparqlRemoteEndpoint endPoint = new SparqlRemoteEndpoint(uri);
-            ISparqlQueryProcessor processor = new RemoteQueryProcessor(endPoint);
-            object queryResult = processor.ProcessQuery(query);
-
-            if (queryResult is SparqlResultSet)
-            {
-                SparqlResultSet entities = (SparqlResultSet)queryResult;
-                return BaprAPI.Utils.Utils.ConvertFromSparqlSetToBaprLocations(entities);
-            }
-            return new Collection<BaprLocation>();
+            return BaprAPI.Utils.Utils.ParseSparqlQuery(sparqlQueryString, @"http://linkedgeodata.org/sparql");
         }
     }
 }

@@ -30,6 +30,7 @@ namespace BaprAPI.Controllers
         public ICollection<BaprLocation> GetFromDbpedia(string text, double latitude, double longitude, IUserPreference userPreference)
         {
             var cuisineFromDb = BaprAPI.Utils.Utils.GetCuisines(userPreference, true);
+            var interests = BaprAPI.Utils.Utils.GetInterests(userPreference);
             string searchQueryByText = "SELECT DISTINCT ?lat ?long ?name ?address ?cuisine ?website ?established ?comment WHERE{\n"
               + "?s a dbo:Location .\n"
               + "?s geo:lat ?lat .\n"
@@ -42,14 +43,15 @@ namespace BaprAPI.Controllers
               + "OPTIONAL { ?s dbo:cuisine ?cuisine .}\n"
               + "OPTIONAL { ?s foaf:homepage ?website .}\n"
               + "FILTER(langMatches(lang(?name ), \"en\") "
-                + " && ?lat >" + latitude + " - 1 && ?lat < " + latitude + "+ 1 "
-                + " && ?long > " + longitude + " - 1 && ?long < " + longitude + " + 1"
+                + " && ?lat >" + latitude + " - 0.5 && ?lat < " + latitude + "+ 0.5 "
+                + " && ?long > " + longitude + " - 0.5 && ?long < " + longitude + " + 0.5"
                + "  && contains(lcase(?name),lcase(\"" + text.ToLower() + "\"))"
-               + "  && ((?type=dbo:Restaurant &&" + (!string.IsNullOrEmpty(cuisineFromDb) ? " lcase(?cuisine) in (" + cuisineFromDb + ")) " : string.Empty)
-                      +"|| (?type = dbo:Museum && contains(lcase(str(?type)), \"history\") )"
+               + "  && ((?type=dbo:Restaurant " + (!string.IsNullOrEmpty(cuisineFromDb) ? "&& lcase(?cuisine) in (" + cuisineFromDb + ")" : string.Empty) + ")\n"
+                      + "|| (?type = dbo:Museum  " + (!string.IsNullOrEmpty(interests) ? " &&?type in (" + interests + ")" : string.Empty) + ")\n"
+
                       + "|| ?type=dbo:Town || ?type=dbo:Village "
                       + "|| ?type=dbo:Park || ?type=dbo:Garden || ?type=dbo:HistoricPlace || ?type=dbo:Monument)) "
-              + "}LIMIT 20";
+              + "}LIMIT 10";
 
             SparqlParameterizedString sparqlQueryString = new SparqlParameterizedString();
             sparqlQueryString.Namespaces.AddNamespace("rdf", new Uri("http://www.w3.org/1999/02/22-rdf-syntax-ns#"));
@@ -60,20 +62,8 @@ namespace BaprAPI.Controllers
             sparqlQueryString.Namespaces.AddNamespace("foaf", new Uri("http://xmlns.com/foaf/0.1/"));
             sparqlQueryString.CommandText = searchQueryByText;
 
-            SparqlQueryParser parser = new SparqlQueryParser();
-            SparqlQuery query = parser.ParseFromString(sparqlQueryString);
-
-            Uri uri = new Uri(@"http://dbpedia.org/sparql");
-            SparqlRemoteEndpoint endPoint = new SparqlRemoteEndpoint(uri);
-            ISparqlQueryProcessor processor = new RemoteQueryProcessor(endPoint);
-            object queryResult = processor.ProcessQuery(query);
-
-            if (queryResult is SparqlResultSet)
-            {
-                SparqlResultSet entities = (SparqlResultSet)queryResult;
-                return BaprAPI.Utils.Utils.ConvertFromSparqlSetToBaprLocations(entities);
-            }
-            return new Collection<BaprLocation>();
+            return BaprAPI.Utils.Utils.ParseSparqlQuery(sparqlQueryString, @"http://dbpedia.org/sparql");
+           
         }
 
         public ICollection<BaprLocation> GetFromLinkedGeoData(string text, double latitude, double longitude, IUserPreference userPreference)
@@ -91,10 +81,10 @@ namespace BaprAPI.Controllers
                 + (userPreference.NeedWheelchair ? "?s lgd:wheelchair ?wheelchair. FILTER (?wheelchair =" + BaprAPI.Models.Constants.xsdBooleanIsTrue + ")\n"
                                                       : " OPTIONAL {?s lgd:wheelchair ?wheelchair.} \n")
                 + "FILTER (langMatches(lang(?name ), \"en\") \n"
-                + " && ?lat > " + latitude + " - 1 && ?lat < " + latitude + " + 1 "
-                + " && ?long > " + longitude + " - 1 && ?long < " + longitude + " + 1 \n"
+                + " && ?lat > " + latitude + " - 0.5 && ?lat < " + latitude + " + 0.5 "
+                + " && ?long > " + longitude + " - 0.5 && ?long < " + longitude + " + 0.5\n"
                 + " && contains(lcase(?name),lcase(\"" + text.ToLower() + "\"))\n"
-                + " && ((?type = lgd:Restaurant " + (!string.IsNullOrEmpty(cuisine) ? "&& lcase(?cuisine) in (" + cuisine + ")) \n" : string.Empty)
+                + " && ((?type = lgd:Restaurant " + (!string.IsNullOrEmpty(cuisine) ? "&& lcase(?cuisine) in (" + cuisine + ")" : string.Empty) + ") \n"
                         + "|| ?type = lgd:Hospital || ?type = lgd:Bar || ?type = lgd:Bank \n"
                         + "|| ?type = lgd:Pharmacy || ?type = lgd:FastFood || ?type=lgd:Cafe || ?type=lgd:Pub || ?type= lgd:Theatre"
                         + "|| ?type = lgd:Museum))"
@@ -109,20 +99,8 @@ namespace BaprAPI.Controllers
             sparqlQueryString.Namespaces.AddNamespace("foaf", new Uri("http://xmlns.com/foaf/0.1/"));
             sparqlQueryString.CommandText = searchQueryByText;
 
-            SparqlQueryParser parser = new SparqlQueryParser();
-            SparqlQuery query = parser.ParseFromString(sparqlQueryString);
-
-            Uri uri = new Uri(@"http://linkedgeodata.org/sparql");
-            SparqlRemoteEndpoint endPoint = new SparqlRemoteEndpoint(uri);
-            ISparqlQueryProcessor processor = new RemoteQueryProcessor(endPoint);
-            object queryResult = processor.ProcessQuery(query);
-
-            if (queryResult is SparqlResultSet)
-            {
-                SparqlResultSet entities = (SparqlResultSet)queryResult;
-                return BaprAPI.Utils.Utils.ConvertFromSparqlSetToBaprLocations(entities);
-            }
-            return new Collection<BaprLocation>();
+            return BaprAPI.Utils.Utils.ParseSparqlQuery(sparqlQueryString, @"http://linkedgeodata.org/sparql");
+           
         }
 
         [HttpGet]

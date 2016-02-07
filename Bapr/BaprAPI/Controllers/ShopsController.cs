@@ -30,8 +30,8 @@ namespace BaprAPI.Controllers
             var userPreference = BaprAPI.Utils.Utils.GetUserPreference(userEmail);
             var fromDbPedia = DbPedia_GetShopsNearby(lat, lng, userPreference);
             var fromLinkedGeoData = LinkedGeoData_GetShopsNearby(lat, lng, userPreference);
-          //  Collection<BaprLocation> result = fromDbPedia.Concat(fromLinkedGeoData).ToList();
-            return new HttpResponseMessage(HttpStatusCode.OK);//200
+            var allCollections = fromDbPedia.Concat(fromLinkedGeoData);
+           return Request.CreateResponse(HttpStatusCode.OK, allCollections);
         }
         public Collection<BaprLocation> DbPedia_GetShopsNearby(double lat, double lng, IUserPreference userPreference) 
         {
@@ -45,8 +45,8 @@ namespace BaprAPI.Controllers
                            "?shop geo:long ?long.\n" +
                            "FILTER (?p=<http://www.w3.org/2000/01/rdf-schema#label>).\n" +
                            "FILTER (?type IN (<http://dbpedia.org/ontology/ShoppingMall>, <http://schema.org/ShoppingCenter>)).\n" +
-                           //"FILTER ( ?long > " + lng + " - 1 && ?long < " + lng + " + 1 && \n" +
-                           //"?lat > " + lat + " - 1 && ?lat < " + lat + " + 1)\n" +
+                           "FILTER ( ?long > " + lng + " - 0.5 && ?long < " + lng + " + 0.5 && \n" +
+                           "?lat > " + lat + " - 0.5 && ?lat < " + lat + " + 0.5)\n" +
                            "FILTER ( lang(?name) = 'en')}\n" +
                            "LIMIT 30";
 
@@ -57,16 +57,8 @@ namespace BaprAPI.Controllers
             dbpediaQuery.Namespaces.AddNamespace("schema", new Uri("http://schema.org/"));
             dbpediaQuery.CommandText = myQuery;
 
-            SparqlQueryParser parser = new SparqlQueryParser();
-            SparqlQuery query = parser.ParseFromString(dbpediaQuery);
-            Uri uri = new Uri(@"http://dbpedia.org/sparql");
-            SparqlResultSet resultSet = new SparqlResultSet();
-            ISparqlResultsHandler resultsHandler = new ResultSetHandler(resultSet);
-            SparqlRemoteEndpoint endPoint = new SparqlRemoteEndpoint(uri);
-            ISparqlQueryProcessor processor = new RemoteQueryProcessor(endPoint);
-
-            SparqlResultSet result = (SparqlResultSet)processor.ProcessQuery(query);
-            return BaprAPI.Utils.Utils.ConvertFromSparqlSetToBaprLocations(result);
+            return BaprAPI.Utils.Utils.ParseSparqlQuery(dbpediaQuery, @"http://dbpedia.org/sparql");
+           
         }
 
         private Collection<BaprLocation> LinkedGeoData_GetShopsNearby(double lat, double lng, IUserPreference userPreference)
@@ -82,8 +74,8 @@ namespace BaprAPI.Controllers
                             "?shop geo:long ?long.\n" +
                             "FILTER (?p=<http://www.w3.org/2000/01/rdf-schema#label>).\n" +
                             "FILTER (?type IN (<http://linkedgeodata.org/ontology/ShoppingCenter>, <http://schema.org/ShoppingCenter>))\n" +
-                            //"FILTER ( ?long > " + lng + " - 1 && ?long < " + lng + " + 1 && \n" +
-                            //"?lat > " + lat + " - 1 && ?lat < " + lat + " + 1)\n" +
+                            "FILTER ( ?long > " + lng + " - 0.5 && ?long < " + lng + " + 0.5 && \n" +
+                            "?lat > " + lat + " - 0.5 && ?lat < " + lat + " + 0.5)\n" +
                             "}LIMIT 30";
 
             SparqlParameterizedString lgdoQuery = new SparqlParameterizedString();
@@ -91,19 +83,10 @@ namespace BaprAPI.Controllers
             lgdoQuery.Namespaces.AddNamespace("lgdo", new Uri("http://linkedgeodata.org/ontology/"));
             lgdoQuery.Namespaces.AddNamespace("geo", new Uri("http://www.w3.org/2003/01/geo/wgs84_pos#"));
             lgdoQuery.Namespaces.AddNamespace("foaf", new Uri("http://xmlns.com/foaf/spec/"));
-
             lgdoQuery.CommandText = myQuery;
 
-            SparqlQueryParser parser = new SparqlQueryParser();
-            SparqlQuery query = parser.ParseFromString(lgdoQuery);
-            Uri uri = new Uri(@"http://linkedgeodata.org/sparql");
-            SparqlResultSet resultSet = new SparqlResultSet();
-            ISparqlResultsHandler resultsHandler = new ResultSetHandler(resultSet);
-            SparqlRemoteEndpoint endPoint = new SparqlRemoteEndpoint(uri);
-            ISparqlQueryProcessor processor = new RemoteQueryProcessor(endPoint);
-
-            SparqlResultSet result = (SparqlResultSet)processor.ProcessQuery(query);
-            return BaprAPI.Utils.Utils.ConvertFromSparqlSetToBaprLocations(result);
+            return BaprAPI.Utils.Utils.ParseSparqlQuery(lgdoQuery, @"http://linkedgeodata.org/sparql");
+           
         }
     }
 }

@@ -5,6 +5,9 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Web;
+using VDS.RDF;
+using VDS.RDF.Parsing;
+using VDS.RDF.Parsing.Handlers;
 using VDS.RDF.Query;
 
 namespace BaprAPI.Utils
@@ -21,7 +24,7 @@ namespace BaprAPI.Utils
                 var currentUser = ctx.Users.FirstOrDefault(x => x.Email == email);
                 if (currentUser != null)
                 {
-                    return currentUser.UserPreference;
+                    return currentUser.UserPreference ?? new UserPreference();
                 }
             }
             return new UserPreference();
@@ -30,12 +33,32 @@ namespace BaprAPI.Utils
         public static string GetCuisines(IUserPreference userPreference, bool addXsdSTring)
         {
             var result = string.Empty;
-            var cuisines = userPreference.Cuisine.Where(c => c.Checked == true).Select(c => c.Name.ToLower());
-            foreach (var cuisine in cuisines)
+            if (userPreference != null && userPreference.Cuisine != null)
             {
-                result = result + "\"" + cuisine + "\"" + (addXsdSTring ? Constants.xsdString : string.Empty) + ",";
+                var cuisines = userPreference.Cuisine.Where(c => c.Checked == true).Select(c => c.Name.ToLower());
+                foreach (var cuisine in cuisines)
+                {
+                    result = result + "\"" + cuisine + "\"" + (addXsdSTring ? Constants.xsdString : string.Empty) + ",";
+                }
+                result = !string.IsNullOrEmpty(result) ? result.Remove(result.Length - 1) : result;
             }
-            result = !string.IsNullOrEmpty(result) ? result.Remove(result.Length - 1) : result;
+            return result;
+        }
+
+        public static string GetInterests(IUserPreference userPreference)
+        {
+            var result = string.Empty;
+            if (userPreference != null && userPreference.Interests != null)
+            {
+                var interests = userPreference.Interests.Where(c => c.Checked == true).Select(c => c.Name.ToLower());
+                foreach (var interest in interests)
+                {
+                    result = result + string.Format("<http://dbpedia.org/resource/{0}>", interest) + ",";
+                }
+                result = !string.IsNullOrEmpty(result) ? result.Remove(result.Length - 1) : result;
+
+            }
+
             return result;
         }
 
@@ -104,6 +127,43 @@ namespace BaprAPI.Utils
                 finalResult.Add(baprLocation);
             }
             return finalResult;
+        }
+
+        private static Collection<BaprLocation> ExecuteQuery(ISparqlQueryProcessor processor, SparqlQuery query)
+        {
+            try
+            {
+                object queryResult = processor.ProcessQuery(query);
+                if (queryResult is SparqlResultSet)
+                {
+                    SparqlResultSet entities = (SparqlResultSet)queryResult;
+                    return BaprAPI.Utils.Utils.ConvertFromSparqlSetToBaprLocations(entities);
+                }
+            }
+            catch (VDS.RDF.Query.RdfQueryException ex)
+            {
+
+            }
+            return new Collection<BaprLocation>();
+        }
+
+        public static Collection<BaprLocation> ParseSparqlQuery(SparqlParameterizedString queryString, string endpointUrl)
+        {
+            try
+            {
+                SparqlQueryParser parser = new SparqlQueryParser();
+                SparqlQuery query = parser.ParseFromString(queryString);
+
+                Uri uri = new Uri(endpointUrl);
+                SparqlRemoteEndpoint endPoint = new SparqlRemoteEndpoint(uri);
+                ISparqlQueryProcessor processor = new RemoteQueryProcessor(endPoint);
+                return BaprAPI.Utils.Utils.ExecuteQuery(processor, query);
+            }
+            catch (VDS.RDF.RdfException ex)
+            {
+
+            }
+            return new Collection<BaprLocation>();
         }
     }
 }
