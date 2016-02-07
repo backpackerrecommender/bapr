@@ -32,6 +32,7 @@ namespace BaprAPI.Controllers
             var fromLinkedGeoData = GetFromLinkedGeoData(lat, lng, userPreference);
             return new HttpResponseMessage(HttpStatusCode.OK);//200
         }
+
         private ICollection<ILocation> GetFromDbpedia(double latitude, double longitude, IUserPreference userPreference)
         {
             string searchHotelsQuery = "SELECT DISTINCT * WHERE {\n ?f a dbo:Hotel ."
@@ -73,7 +74,6 @@ namespace BaprAPI.Controllers
 
             return new Collection<ILocation>();
         }
-
         private ICollection<ILocation> GetFromLinkedGeoData(double latitude, double longitude, IUserPreference userPreference)
         {
 
@@ -83,6 +83,7 @@ namespace BaprAPI.Controllers
                 + " ?f foaf:phone ?phone. \n"
                 + " ?f geo:lat ?lat .\n"
                 + " ?f geo:long ?long . \n"
+                + " OPTIONAL { ?f lgd:address ?address .}\n " 
                 + " OPTIONAL {?f lgd:rooms ?rooms.} \n"
                 + " OPTIONAL {?f lgd:internet_access ?internetAccess.} \n"
                 + " OPTIONAL {?f lgd:opening_hours ?opening_hours.} \n"

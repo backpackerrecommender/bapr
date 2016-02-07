@@ -34,7 +34,7 @@ namespace Bapr.Controllers
 
         public ActionResult  GetFavouritedPlaces()
         {
-            string user = Session["logged_username"].ToString();
+            string user = GetUserEmail();
 
             HttpClient client = new HttpClient();
             client.BaseAddress = new Uri("http://localhost:18323/api/MarkedLocations/Favorites");
@@ -51,9 +51,10 @@ namespace Bapr.Controllers
  
             return Json(new { }, JsonRequestBehavior.AllowGet);
         }
+
         public ActionResult GetVisitedPlaces()
         {
-            string user = Session["logged_username"].ToString();
+            string user = GetUserEmail();
 
             HttpClient client = new HttpClient();
             client.BaseAddress = new Uri("http://localhost:18323/api/MarkedLocations/Visited");
@@ -81,7 +82,8 @@ namespace Bapr.Controllers
                     client.DefaultRequestHeaders.Accept.Clear();
                     client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
-                    var urlParam = "?text=" + text + "&latitude=" + latitude + "&longitude=" + longitude;
+                    var urlParam = "?text=" + text + "&latitude=" + latitude 
+                                    + "&longitude=" + longitude +"&userEmail=" + GetUserEmail();
                     HttpResponseMessage response = client.GetAsync(urlParam).Result;
                     if (response.IsSuccessStatusCode)
                     {
@@ -97,6 +99,7 @@ namespace Bapr.Controllers
 
             return Json(locations, JsonRequestBehavior.AllowGet);
         }
+
         public ActionResult GetPlacesByCategory(PlaceCategory category, double latitude, double longitude)
         {
             HttpClient client = new HttpClient();
@@ -123,12 +126,8 @@ namespace Bapr.Controllers
                     break;
             }
        
-            var session = Session["logged_username"];
-            var userEmail = string.Empty;
-            if (session != null)
-            {
-                userEmail = session.ToString();
-            }
+          
+            var userEmail = GetUserEmail();
             var urlParam = "?lat=" + latitude + "&lng=" + longitude + "&userEmail=" + userEmail;
             HttpResponseMessage response = client.GetAsync(urlParam).Result;
             var result = response.Content.ReadAsStringAsync().Result;
@@ -137,7 +136,7 @@ namespace Bapr.Controllers
 
         public ActionResult MarkLocation(Location location, string type)
         {
-            string user = Session["logged_username"].ToString();
+            string user = GetUserEmail();
 
             HttpClient client = new HttpClient();
             client.BaseAddress = new Uri("http://localhost:18323/api/MarkedLocations/MarkLocation");
@@ -190,5 +189,15 @@ namespace Bapr.Controllers
 
         #endregion
 
+        private string GetUserEmail()
+        {
+            var session = Session["logged_username"];
+            var userEmail = string.Empty;
+            if (session != null)
+            {
+                userEmail = session.ToString();
+            }
+            return userEmail;
+        }
     }
 }

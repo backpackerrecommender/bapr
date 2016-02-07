@@ -22,10 +22,10 @@ $(document).ready(function () {
         ajaxStop: function () { $body.removeClass("loading"); }
     });
     $("#tabs").tabs();
-    $('#btnGetFavourites').click(function() {
+    $('#btnGetFavourites').click(function () {
         insertHTML("locationDetails", "");
         var url = $(this).data('action');
-        $.get(url, function(data) {
+        $.get(url, function (data) {
             displayMarkers(data);
         });
     });
@@ -44,13 +44,18 @@ $(document).ready(function () {
         var latitude = $('.latitude').attr('title');
         var longitude = $('.longitude').attr('title');
         if (text != null && text != "") {
-            $.get(url, { text: text, latitude:latitude, longitude:longitude }, function(data) {
-                displayMarkers(data);
+            $.get(url, { text: text, latitude: latitude, longitude: longitude }, function (data) {
+                try {
+                    locReadyForDisplay = JSON.parse(data);
+                } catch (ex) {
+                    console.error(ex);
+                }
+                displayMarkers(locReadyForDisplay);
             });
         }
     });
 
-    $('#placeCategory').change(function() {
+    $('#placeCategory').change(function () {
         insertHTML("locationDetails", "");
 
         var selectedValue = $(this).val();
@@ -76,6 +81,8 @@ function displayMarkers(locations) {
         zoom: 7,
         center: latLng
     });
+
+
     $.each(locations, function (key, location) {
         addMarker(location, map);
     });

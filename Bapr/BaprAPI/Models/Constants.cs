@@ -12,6 +12,7 @@ namespace BaprAPI.Models
         public static string storeConnectionString = "type=embedded;storesdirectory=" + Constants.StoreLocation + ";storename=Users";
         
         public static string xsdBooleanIsTrue= "\"true\"^^<http://www.w3.org/2001/XMLSchema#boolean>";
-    
+
+        public static string xsdString = "^^<http://www.w3.org/2001/XMLSchema#string>";
     }
 }
