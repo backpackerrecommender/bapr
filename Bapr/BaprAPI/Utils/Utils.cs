@@ -88,8 +88,10 @@ namespace BaprAPI.Utils
                     {
                         @value = @value.Trim();
                         var indexForName = @value.IndexOf('@');
-                        if (indexForName == @value.Length - 3)
+                        if (indexForName == @value.Length - 3 && indexForName > -1)
+                        {
                             @value = @value.Remove(indexForName);
+                        }
                         baprLocation.attributes.Add(new BaprLocationAttribute
                         {
                             Name = attr,

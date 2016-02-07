@@ -3,12 +3,15 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
+using System.Data;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Web.Http;
+using VDS.RDF;
 using VDS.RDF.Parsing;
 using VDS.RDF.Query;
+using VDS.RDF.Query.Inference;
 using VDS.RDF.Writing;
 
 namespace BaprAPI.Controllers
@@ -64,7 +67,7 @@ namespace BaprAPI.Controllers
             SparqlRemoteEndpoint endPoint = new SparqlRemoteEndpoint(uri);
             ISparqlQueryProcessor processor = new RemoteQueryProcessor(endPoint);
             object queryResult = processor.ProcessQuery(query);
-           
+
             if (queryResult is SparqlResultSet)
             {
                 SparqlResultSet entities = (SparqlResultSet)queryResult;
@@ -121,5 +124,212 @@ namespace BaprAPI.Controllers
             }
             return new Collection<BaprLocation>();
         }
+
+        [HttpGet]
+        public HttpResponseMessage InferredGet(string text, double latitude, double longitude)
+        {
+            UnionGraph resultsGraph = GetUnionGraph();
+            Graph outputGraph = new Graph();
+
+            //resultsGraph.NamespaceMap.AddNamespace("dbo", new Uri("http://dbpedia.org/ontology/"));
+            Graph ontology = new Graph();
+            FileLoader.Load(ontology, System.AppDomain.CurrentDomain.BaseDirectory.ToString() + Constants.Ontology);
+
+            StaticRdfsReasoner reasoner = new StaticRdfsReasoner();
+            reasoner.Initialise(ontology);
+            reasoner.Apply(resultsGraph, outputGraph);
+
+            Collection<BaprLocation> locations = ExtractResults(resultsGraph, GetInferredPlaces(outputGraph));
+            return Request.CreateResponse(HttpStatusCode.OK, locations);
+        }
+
+        private UnionGraph GetUnionGraph()
+        {
+            SparqlQuery restaurantsQuery = GetRestaurantsQuery();
+            SparqlQuery hotelsQuery = GetHotelsQuery();
+            SparqlQuery museumsQuery = GetGeneralQuery("Museum");
+            SparqlQuery hospitalsQuery = GetGeneralQuery("Hospital");
+            SparqlQuery shopsQuery = GetGeneralQuery("ShoppingMall");
+
+            Uri uri = new Uri(@"http://dbpedia.org/sparql");
+            SparqlRemoteEndpoint endPoint = new SparqlRemoteEndpoint(uri);
+            ISparqlQueryProcessor processor = new RemoteQueryProcessor(endPoint);
+            Graph restaurantsGraph = (Graph)processor.ProcessQuery(restaurantsQuery);
+            Graph hotelsGraph = (Graph)processor.ProcessQuery(hotelsQuery);
+            Graph museumsGraph = (Graph)processor.ProcessQuery(museumsQuery);
+            Graph hospitalsGraph = (Graph)processor.ProcessQuery(hospitalsQuery);
+            Graph shopsGraph = (Graph)processor.ProcessQuery(shopsQuery);
+
+            List<Graph> all = new List<Graph>();
+            all.Add(restaurantsGraph);
+            all.Add(hotelsGraph);
+            all.Add(museumsGraph);
+            all.Add(hospitalsGraph);
+            all.Add(shopsGraph);
+            return new UnionGraph(new Graph(), all);
+        }
+
+        private List<string> GetInferredPlaces(Graph outputGraph)
+        {
+            List<string> inferredResults = new List<string>();
+            foreach (DataRow row in outputGraph.ToDataTable().Rows)
+            {
+                inferredResults.Add(row.ItemArray[0].ToString());
+            }
+
+            return inferredResults;
+        }
+
+        private Collection<BaprLocation> ExtractResults(Graph graph, List<string> inferredResults)
+        {
+            Collection<BaprLocation> results = new Collection<BaprLocation>();
+            List<object[]> itemsArray = new List<object[]>();
+            foreach (DataRow row in graph.ToDataTable().Rows)
+            {
+                itemsArray.Add(row.ItemArray);
+            }
+            foreach (var group in itemsArray.GroupBy(x => x[0]))
+            {
+                if (!inferredResults.Contains(group.Key.ToString()))
+                    continue;
+
+                BaprLocation location = new BaprLocation();
+                location.attributes = new Collection<BaprLocationAttribute>();
+                foreach (object[] attribute in group)
+                {
+                    string attrValue = attribute[2].ToString();
+                    if (attribute[1].ToString().Contains("label"))
+                        location.name = GetAttributeName(attrValue);
+                    else if (attribute[1].ToString().Contains("lat"))
+                        location.latitude = GetCoordinate(attrValue);
+                    else if (attribute[1].ToString().Contains("long"))
+                        location.longitude = GetCoordinate(attrValue);
+                    else
+                    {
+                        BaprLocationAttribute attr = new BaprLocationAttribute();
+                        attr.Name = GetLastSubstring(attribute[1].ToString());
+                        attr.Value = SplitValue(attribute[1].ToString(), attribute[2].ToString());
+                        attr.Type = "string";
+                        location.attributes.Add(attr);
+                    }
+                }
+                results.Add(location);
+            }
+
+            return results;
+        }
+
+        private SparqlQuery GetRestaurantsQuery()
+        {
+            string query = @"CONSTRUCT WHERE {
+                ?f rdf:type dbo:Restaurant . 
+                ?f dbo:cuisine ?cuisine .
+                ?f foaf:homepage ?website .
+                ?f rdfs:label ?name .
+                ?f geo:lat ?latitude .
+                ?f geo:long ?longitude .
+                ?f dbo:address ?address
+                } LIMIT 30";
+
+            SparqlParameterizedString queryString = new SparqlParameterizedString();
+            //Add a namespace declaration
+            queryString.Namespaces.AddNamespace("dbo", new Uri("http://dbpedia.org/ontology/"));
+            queryString.Namespaces.AddNamespace("rdfs", new Uri("http://www.w3.org/2000/01/rdf-schema#"));
+            queryString.Namespaces.AddNamespace("rdf", new Uri("http://www.w3.org/1999/02/22-rdf-syntax-ns#"));
+            queryString.Namespaces.AddNamespace("foaf", new Uri("http://xmlns.com/foaf/0.1/"));
+            queryString.Namespaces.AddNamespace("geo", new Uri("http://www.w3.org/2003/01/geo/wgs84_pos#"));
+            queryString.CommandText = query;
+
+            SparqlQueryParser parser = new SparqlQueryParser();
+            return parser.ParseFromString(queryString);
+        }
+
+        private SparqlQuery GetHotelsQuery()
+        {
+            string query = @"CONSTRUCT WHERE
+                { 
+                    ?f rdf:type dbo:Hotel . 
+                    ?f rdfs:label ?name .
+                    ?f geo:lat ?latitude .
+                    ?f geo:long ?longitude .
+                    ?f foaf:homepage ?website .
+                    ?f dbp:numberOfRooms ?numberOfRooms. 
+                    ?f dbp:numberOfSuites ?numberOfSuites.
+                } LIMIT 30 ";
+
+            SparqlParameterizedString queryString = new SparqlParameterizedString();
+            //Add a namespace declaration
+            queryString.Namespaces.AddNamespace("dbo", new Uri("http://dbpedia.org/ontology/"));
+            queryString.Namespaces.AddNamespace("rdfs", new Uri("http://www.w3.org/2000/01/rdf-schema#"));
+            queryString.Namespaces.AddNamespace("rdf", new Uri("http://www.w3.org/1999/02/22-rdf-syntax-ns#"));
+            queryString.Namespaces.AddNamespace("foaf", new Uri("http://xmlns.com/foaf/0.1/"));
+            queryString.Namespaces.AddNamespace("dbp", new Uri("http://dbpedia.org/property/"));
+            queryString.Namespaces.AddNamespace("geo", new Uri("http://www.w3.org/2003/01/geo/wgs84_pos#"));
+            queryString.CommandText = query;
+
+            SparqlQueryParser parser = new SparqlQueryParser();
+            return parser.ParseFromString(queryString);
+        }
+
+        private SparqlQuery GetGeneralQuery(string type)
+        {
+            string query = @"CONSTRUCT WHERE {?f rdf:type dbo:" + type + " . ?f rdfs:label ?name . ?f foaf:homepage ?website . ?f geo:lat ?latitude . ?f geo:long ?longitude . } LIMIT 30";
+
+            SparqlParameterizedString queryString = new SparqlParameterizedString();
+            //Add a namespace declaration
+            queryString.Namespaces.AddNamespace("rdf", new Uri("http://www.w3.org/1999/02/22-rdf-syntax-ns#"));
+            queryString.Namespaces.AddNamespace("rdfs", new Uri("http://www.w3.org/2000/01/rdf-schema#"));
+            queryString.Namespaces.AddNamespace("foaf", new Uri("http://xmlns.com/foaf/0.1/"));
+            queryString.Namespaces.AddNamespace("dbo", new Uri("http://dbpedia.org/ontology/"));
+            queryString.Namespaces.AddNamespace("geo", new Uri("http://www.w3.org/2003/01/geo/wgs84_pos#"));
+            queryString.CommandText = query;
+
+            SparqlQueryParser parser = new SparqlQueryParser();
+            return parser.ParseFromString(queryString);
+        }
+
+        #region data extractor
+        private double GetCoordinate(string text)
+        {
+            string strNumber = text.Split(new char[] { '^' })[0];
+            return Convert.ToDouble(strNumber);
+        }
+
+        private string GetAttributeName(string text)
+        {
+            string[] splitText = text.Split(new string[] { "@", "#", @"\", "/" }, StringSplitOptions.RemoveEmptyEntries);
+            return splitText[0];
+        }
+
+        private string GetLastSubstring(string name)
+        {
+            string[] splitText = name.Split(new string[] { "@", "#", @"\", "/" }, StringSplitOptions.RemoveEmptyEntries);
+            string result = splitText[splitText.Length - 1];
+            return result;
+        }
+
+        private string SplitValue(string name, string value)
+        {
+            if (name == "address")
+            {
+                string[] splitText = value.Split(new string[] { "@", "#", @"\", "/" }, StringSplitOptions.RemoveEmptyEntries);
+                string result = splitText[splitText.Length - 1];
+                return GetLastSubstring(result);
+            }
+            else if (name == "homepage")
+            {
+                return value;
+            }
+            else if (value.Contains("^^"))
+            {
+                return value.Split(new char[] { '^' })[0];
+            }
+            else if (name.Contains("type"))
+            {
+                return GetLastSubstring(value);
+            }
+            return value;
+        }
+        #endregion
     }
 }

@@ -14,5 +14,7 @@ namespace BaprAPI.Models
         public static string xsdBooleanIsTrue= "\"true\"^^<http://www.w3.org/2001/XMLSchema#boolean>";
 
         public static string xsdString = "^^<http://www.w3.org/2001/XMLSchema#string>";
+
+        public static string Ontology = "Utils\\ontology.owl";
     }
 }

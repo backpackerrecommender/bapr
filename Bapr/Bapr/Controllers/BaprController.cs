@@ -48,7 +48,7 @@ namespace Bapr.Controllers
                 Collection<Location> markedLocations = JsonConvert.DeserializeObject<Collection<Location>>(result);
                 return Json(markedLocations, JsonRequestBehavior.AllowGet);
             }
- 
+
             return Json(new { }, JsonRequestBehavior.AllowGet);
         }
 
@@ -74,22 +74,23 @@ namespace Bapr.Controllers
 
         public ActionResult GetPlacesByText(string text, string latitude, string longitude)
         {
-            if (!string.IsNullOrEmpty(text))
-            {
-                using (var client = new HttpClient())
-                {
-                    client.BaseAddress = new Uri("http://localhost:18323/api/Locations/Get");
-                    client.DefaultRequestHeaders.Accept.Clear();
-                    client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+            string url = string.IsNullOrEmpty(text) ?
+                "http://localhost:18323/api/Locations/InferredGet" :
+                "http://localhost:18323/api/Locations/Get";
 
-                    var urlParam = "?text=" + text + "&latitude=" + latitude 
-                                    + "&longitude=" + longitude +"&userEmail=" + GetUserEmail();
-                    HttpResponseMessage response = client.GetAsync(urlParam).Result;
-                    if (response.IsSuccessStatusCode)
-                    {
-                        var result = response.Content.ReadAsStringAsync().Result;
-                        return Json(result, JsonRequestBehavior.AllowGet);
-                    }
+            using (var client = new HttpClient())
+            {
+                client.BaseAddress = new Uri(url);
+                client.DefaultRequestHeaders.Accept.Clear();
+                client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+
+                var urlParam = "?text=" + text + "&latitude=" + latitude
+                                + "&longitude=" + longitude + "&userEmail=" + GetUserEmail();
+                HttpResponseMessage response = client.GetAsync(urlParam).Result;
+                if (response.IsSuccessStatusCode)
+                {
+                    var result = response.Content.ReadAsStringAsync().Result;
+                    return Json(result, JsonRequestBehavior.AllowGet);
                 }
             }
 
@@ -125,8 +126,8 @@ namespace Bapr.Controllers
                     client.BaseAddress = new Uri("http://localhost:18323/api/Museums/GetHospitalsNearby");
                     break;
             }
-           
-            
+
+
             var userEmail = GetUserEmail();
             var urlParam = "?lat=" + latitude + "&lng=" + longitude + "&userEmail=" + userEmail;
             HttpResponseMessage response = client.GetAsync(urlParam).Result;
@@ -142,17 +143,19 @@ namespace Bapr.Controllers
         public ActionResult MarkLocation(Location location, string type)
         {
             string user = GetUserEmail();
+            if (!String.IsNullOrEmpty(user))
+            {
+                string uri = "http://localhost:18323/api/MarkedLocations/MarkLocation";
+                HttpClient client = new HttpClient();
 
-            HttpClient client = new HttpClient();
-            client.BaseAddress = new Uri("http://localhost:18323/api/MarkedLocations/MarkLocation");
-            client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+                var formVars = new Dictionary<string, string>();
+                formVars.Add("user", user);
+                formVars.Add("type", type);
+                formVars.Add("location", new JavaScriptSerializer().Serialize(location));
+                var content = new FormUrlEncodedContent(formVars);
 
-            var json = new JavaScriptSerializer().Serialize(location);
-            string urlParameters = "?user=" + user + "&location=" + json.ToString() + "&type=" + type;
-
-            HttpContent content = new StringContent("");
-            HttpResponseMessage response = client.PostAsync(urlParameters, content).Result;
-
+                HttpResponseMessage response = client.PostAsync(uri, content).Result;
+            }
             return Json(new { }, JsonRequestBehavior.AllowGet);
         }
 

@@ -49,7 +49,7 @@ $(document).ready(function () {
         var text = $('#userSearchText').val();
         var latitude = $('.latitude').attr('title');
         var longitude = $('.longitude').attr('title');
-        if (text != null && text != "") {
+        if (text != null) {
             $.get(url, { text: text, latitude: latitude, longitude: longitude }, function (data) {
                locReadyForDisplay = deserializeLocations(data);
                 displayMarkers(locReadyForDisplay);
@@ -97,11 +97,6 @@ function clearOverlays() {
 
 function displayMarkers(locations) {
     clearOverlays();
-    var latitude = $('.latitude').attr('title');
-    var longitude = $('.longitude').attr('title');
-    var latLng = {
-        lat: parseFloat(latitude), lng: parseFloat(longitude)
-    }
 
     $.each(locations, function (key, location) {
         addMarker(location, map);

@@ -1,8 +1,6 @@
 ﻿using BaprAPI.Models;
 using BrightstarDB.Client;
-using BrightstarDB.EntityFramework;
 using Newtonsoft.Json;
-using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
@@ -11,6 +9,7 @@ using System.Net.Http;
 using System.Text;
 using System.Web.Http;
 using System.Web.Script.Serialization;
+using System.Net.Http.Formatting;
 
 namespace BaprAPI.Controllers
 {
@@ -18,8 +17,12 @@ namespace BaprAPI.Controllers
     {
         [HttpPost]
         [ActionName("MarkLocation")]
-        public HttpResponseMessage MarkLocation(string user, string location, string type)
+        public HttpResponseMessage MarkLocation([FromBody] FormDataCollection formVars)
         {
+            string user = formVars["user"];
+            string type = formVars["type"];
+            string location = formVars["location"];
+
             string connectionString = Constants.storeConnectionString;
             var client = BrightstarService.GetClient(Constants.storeConnectionString);
 
@@ -38,7 +41,7 @@ namespace BaprAPI.Controllers
                     if(type == "fav")
                         marker.IsFavorite = markedLocation.IsFavorite;
                     else
-                    marker.IsVisited = markedLocation.IsVisited;
+                        marker.IsVisited = markedLocation.IsVisited;
                     usr.MarkedLocations.Add(marker);
                 }
                 else

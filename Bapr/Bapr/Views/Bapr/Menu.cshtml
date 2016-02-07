@@ -10,8 +10,11 @@
     </ul>
     <div id="search">
         <div class="btnsSearch">
-            <button id="btnGetFavourites" type="button" class="btn btn-danger btn-lg" data-action="@Url.Action("GetFavouritedPlaces", "Bapr")">Favourites</button>
-            <button id="btnGetVisited" type="button" class="btn btn-danger btn-lg" data-action="@Url.Action("GetVisitedPlaces", "Bapr")">Visited</button>
+            @if (Session["logged_username"] != null && !Session["logged_username"].ToString().Equals(""))
+            {
+                <button id="btnGetFavourites" type="button" class="btn btn-danger btn-lg" data-action="@Url.Action("GetFavouritedPlaces", "Bapr")">Favourites</button>
+                <button id="btnGetVisited" type="button" class="btn btn-danger btn-lg" data-action="@Url.Action("GetVisitedPlaces", "Bapr")">Visited</button>
+            }  
         </div>
         <br />
         <div id="searchTextFree">
