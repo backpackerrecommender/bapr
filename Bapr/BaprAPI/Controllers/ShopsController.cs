@@ -35,12 +35,15 @@ namespace BaprAPI.Controllers
         }
         public Collection<BaprLocation> DbPedia_GetShopsNearby(double lat, double lng, IUserPreference userPreference) 
         {
-            string myQuery = "SELECT DISTINCT ?name ?address ?openingHours ?lat ?long  \n" +
+            string myQuery = "SELECT DISTINCT ?name ?address ?opening_hours ?number_of_stores ?floors ?parking ?lat ?long  \n" +
                            "WHERE {	\n" +
                            "?shop a ?type. \n" +
                            "?shop ?p ?name. \n" +
                            "Optional { ?shop dbpproperty:address ?address. }" +
-                           "Optional { ?shop schema:openingHours ?openingHours. }\n" +
+                           "Optional { ?shop schema:openingHours ?opening_hours. }\n" +
+                           "Optional { ?shop dbpproperty:floors ?floors. }\n" +
+                           "Optional { ?shop dbpproperty:numberOfStores ?number_of_stores. }\n" +
+                           "Optional { ?shop dbpproperty:parking ?parking. }\n" +
                            "?shop geo:lat ?lat.\n" +
                            "?shop geo:long ?long.\n" +
                            "FILTER (?p=<http://www.w3.org/2000/01/rdf-schema#label>).\n" +
@@ -55,6 +58,7 @@ namespace BaprAPI.Controllers
             dbpediaQuery.Namespaces.AddNamespace("geo", new Uri("http://www.w3.org/2003/01/geo/wgs84_pos#"));
             dbpediaQuery.Namespaces.AddNamespace("dbpproperty", new Uri("http://dbpedia.org/property/"));
             dbpediaQuery.Namespaces.AddNamespace("schema", new Uri("http://schema.org/"));
+            dbpediaQuery.Namespaces.AddNamespace("rdfs", new Uri("http://www.w3.org/2000/01/rdf-schema#"));
             dbpediaQuery.CommandText = myQuery;
 
             return BaprAPI.Utils.Utils.ParseSparqlQuery(dbpediaQuery, @"http://dbpedia.org/sparql");

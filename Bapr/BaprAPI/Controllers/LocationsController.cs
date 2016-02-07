@@ -38,7 +38,7 @@ namespace BaprAPI.Controllers
               + "?s rdfs:label ?name.\n"
               + "?s a ?type. \n"
               + "OPTIONAL { ?s dbp:established ?established.}\n"
-              + "OPTIONAL { ?s rdfs:comment ?comment. FILTER(langMatches(lang(?comment ), \"en\"))}\n"
+              + "OPTIONAL { ?s rfds:comment ?comment. FILTER(langMatches(lang(?comment ), \"en\"))}\n"
               + "OPTIONAL { ?s dbo:address ?address .}\n "
               + "OPTIONAL { ?s dbo:cuisine ?cuisine .}\n"
               + "OPTIONAL { ?s foaf:homepage ?website .}\n"

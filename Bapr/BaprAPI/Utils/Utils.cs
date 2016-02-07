@@ -83,7 +83,7 @@ namespace BaprAPI.Utils
                         @value = @value.Remove(index);
                     }
 
-                    if (attr.Trim() == "head_chef")
+                    if (attr.Trim() == "head_chef" || attr.Trim().Contains("type") || attr.Trim() == "health_care")
                     {
                         string decodedUrlValue = HttpUtility.UrlDecode(@value);
                         var headChef = decodedUrlValue.Substring(decodedUrlValue.LastIndexOf('/') + 1);

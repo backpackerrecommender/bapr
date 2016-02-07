@@ -35,15 +35,18 @@ namespace BaprAPI.Controllers
         }
 
         private Collection<BaprLocation> DbPedia_GetAllHospitalsNearby(double lat, double lng, IUserPreference userPreference)
-        {                                                                                    
-            string myQuery = "SELECT DISTINCT ?name ?website ?address ?phone ?lat ?long \n" +
+        {
+            string myQuery = "SELECT DISTINCT ?name ?website ?address ?phone ?lat ?long ?department ?opening_year ?health_care ?bed_count\n" +
                             "WHERE {	\n" +
                             "?hospital a ?type. \n" +
                             "?hospital ?p ?name. \n" +
-                            "Optional { ?hospital dbpproperty:address ?address. }\n" +
+                            "Optional { ?hospital dbo:address ?address .}\n" +
                             "Optional { ?hospital dbpproperty:website ?website. }\n" +
                             "Optional { ?hospital foaf:phone ?phone. }\n" +
                             "Optional { ?hospital schema:department ?department} \n" +
+                            "Optional { ?hospital dbo:openingYear ?opening_year} \n" +
+                             "Optional { ?hospital dbpproperty:healthcare ?health_care} \n" +
+                              "Optional { ?hospital dbo:bedCount ?bed_count} \n" +
                             "?hospital geo:lat ?lat.\n" +
                             "?hospital geo:long ?long.\n" +
                             "FILTER (?p=<http://www.w3.org/2000/01/rdf-schema#label>).\n" +
@@ -57,6 +60,7 @@ namespace BaprAPI.Controllers
 
             dbpediaQuery.Namespaces.AddNamespace("geo", new Uri("http://www.w3.org/2003/01/geo/wgs84_pos#"));
             dbpediaQuery.Namespaces.AddNamespace("dbpproperty", new Uri("http://dbpedia.org/property/"));
+            dbpediaQuery.Namespaces.AddNamespace("dbo", new Uri("http://dbpedia.org/ontology/"));
             dbpediaQuery.Namespaces.AddNamespace("foaf", new Uri("http://xmlns.com/foaf/spec/"));
             dbpediaQuery.Namespaces.AddNamespace("schema", new Uri("http://schema.org/"));
             dbpediaQuery.CommandText = myQuery;

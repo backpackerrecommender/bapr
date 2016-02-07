@@ -29,13 +29,15 @@ namespace BaprAPI.Controllers
         }
         private Collection<BaprLocation> DbPedia_GetMuseumsNearby(double lat, double lng, IUserPreference userPreference)
         {
-            string myQuery = "SELECT DISTINCT ?name ?website ?address ?phone ?lat ?long  ?comment \n" +
+            string myQuery = "SELECT DISTINCT ?name ?website ?address ?phone ?lat ?long ?museum_type ?publictransit ?comment \n" +
                            "WHERE {	\n" +
                            "?museum a ?type. \n" +
                            "?museum ?p ?name. \n" +
                            "Optional { ?museum dbpproperty:address ?address. }" +
                            "Optional { ?museum dbpproperty:website ?website. }\n" +
                            "Optional { ?museum foaf:phone ?phone. }" +
+                           "Optional { ?museum dbpproperty:type ?museum_type. }" +
+                           "Optional { ?museum dbpproperty:publictransit ?publictransit. }" +
                            "Optional { ?s rdfs:comment ?comment. FILTER(langMatches(lang(?comment ), \"en\"))}\n" +
                            "?museum geo:lat ?lat.\n" +
                            "?museum geo:long ?long.\n" +
@@ -61,13 +63,14 @@ namespace BaprAPI.Controllers
 
         private Collection<BaprLocation> LinkedGeoData_GetMuseumsNearby(double lat, double lng, IUserPreference userPreference) 
         {                                                                  
-            string myQuery = "SELECT DISTINCT ?name ?address ?homepage ?lat ?long \n" +
+            string myQuery = "SELECT DISTINCT ?name ?address ?homepage ?lat ?long  ?opening_hours \n" +
                             "WHERE {	\n" +
                             "?museum a ?type. \n" +
                             "?museum ?p ?name. \n" +
                             "Optional { ?museum lgdo:address ?address. }\n" +
                             "Optional { ?museum foaf:homepage ?homepage. }\n" +
                             "Optional { ?museum foaf:phone ?phone. }\n" +
+                            "Optional { ?museum lgdo:opening_hours ?opening_hours .}\n " +
                             "?museum geo:lat ?lat.\n" +
                             "?museum geo:long ?long.\n" +
                             "FILTER (?p=<http://www.w3.org/2000/01/rdf-schema#label>).\n" +

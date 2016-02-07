@@ -68,7 +68,7 @@ namespace BaprAPI.Controllers
         public Collection<BaprLocation> Linkedgeodata_GetRestaurantsNearby(double lat, double lng, IUserPreference userPreference)
         {
             var cuisine = BaprAPI.Utils.Utils.GetCuisines(userPreference, false);
-            string queryRestaurantsLinkedgeodata = "SELECT DISTINCT ?name ?lat ?long ?cuisine ?comment ?website ?address ?smoking ?internet_access ?wifi ?fast_food \n" +
+            string queryRestaurantsLinkedgeodata = "SELECT DISTINCT ?name ?lat ?long ?cuisine ?comment ?wheelchair ?website ?address ?smoking ?internet_access ?wifi ?fast_food \n" +
                                " WHERE { \n" +
                                 "?f rdf:type lgdo:Restaurant .\n" +
                                 "?f rdfs:label ?name .\n" +

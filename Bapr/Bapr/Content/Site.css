@@ -67,7 +67,6 @@ body,html
     float: left;
     width: 100%;
     overflow-x: auto;
-    height: 200px;
 }
 
 #getPlacesByTextBtn {
@@ -85,6 +84,7 @@ width: 73%;
    top:15%;
    left:2%;
     width: 25%;
+   max-height:75%;
 }
 .modal {
     display:    none;
