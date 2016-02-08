@@ -8,6 +8,7 @@ using System.Net.Http;
 using System.Web.Script.Serialization;
 using System.Net.Http.Headers;
 using Newtonsoft.Json;
+using System.Configuration;
 
 namespace Bapr.Controllers
 {
@@ -37,7 +38,7 @@ namespace Bapr.Controllers
             string user = GetUserEmail();
 
             HttpClient client = new HttpClient();
-            client.BaseAddress = new Uri("http://localhost:18323/api/MarkedLocations/Favorites");
+            client.BaseAddress = new Uri(ConfigurationManager.AppSettings["APIurl"] + "/api/MarkedLocations/Favorites");
             client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
             string urlParameters = "?user=" + user;
@@ -57,7 +58,7 @@ namespace Bapr.Controllers
             string user = GetUserEmail();
 
             HttpClient client = new HttpClient();
-            client.BaseAddress = new Uri("http://localhost:18323/api/MarkedLocations/Visited");
+            client.BaseAddress = new Uri(ConfigurationManager.AppSettings["APIurl"] + "/api/MarkedLocations/Visited");
             client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
             string urlParameters = "?user=" + user;
@@ -75,8 +76,8 @@ namespace Bapr.Controllers
         public ActionResult GetPlacesByText(string text, string latitude, string longitude)
         {
             string url = string.IsNullOrEmpty(text) ?
-                "http://localhost:18323/api/Locations/InferredGet" :
-                "http://localhost:18323/api/Locations/Get";
+                ConfigurationManager.AppSettings["APIurl"] + "/api/Locations/InferredGet" :
+                ConfigurationManager.AppSettings["APIurl"] + "/api/Locations/Get";
 
             using (var client = new HttpClient())
             {
@@ -108,22 +109,22 @@ namespace Bapr.Controllers
             switch (category)
             {
                 case PlaceCategory.Museums:
-                    client.BaseAddress = new Uri("http://localhost:18323/api/Museums/GetMuseumsNearby");
+                    client.BaseAddress = new Uri(ConfigurationManager.AppSettings["APIurl"] + "/api/Museums/GetMuseumsNearby");
                     break;
                 case PlaceCategory.Hospitals:
-                    client.BaseAddress = new Uri("http://localhost:18323/api/Hospitals/GetAllHospitalsNearby");
+                    client.BaseAddress = new Uri(ConfigurationManager.AppSettings["APIurl"] + "/api/Hospitals/GetAllHospitalsNearby");
                     break;
                 case PlaceCategory.Hotels:
-                    client.BaseAddress = new Uri("http://localhost:18323/api/Hotels/GetByCoordinates");
+                    client.BaseAddress = new Uri(ConfigurationManager.AppSettings["APIurl"] + "/api/Hotels/GetByCoordinates");
                     break;
                 case PlaceCategory.Restaurants:
-                    client.BaseAddress = new Uri("http://localhost:18323/api/Restaurants/GetRestaurantsNearby");
+                    client.BaseAddress = new Uri(ConfigurationManager.AppSettings["APIurl"] + "/api/Restaurants/GetRestaurantsNearby");
                     break;
                 case PlaceCategory.Shops:
-                    client.BaseAddress = new Uri("http://localhost:18323/api/Shops/GetShopsNearby");
+                    client.BaseAddress = new Uri(ConfigurationManager.AppSettings["APIurl"] + "/api/Shops/GetShopsNearby");
                     break;
                 default:
-                    client.BaseAddress = new Uri("http://localhost:18323/api/Museums/GetAllHospitalsNearby");
+                    client.BaseAddress = new Uri(ConfigurationManager.AppSettings["APIurl"] + "/api/Museums/GetAllHospitalsNearby");
                     break;
             }
 
@@ -144,7 +145,7 @@ namespace Bapr.Controllers
             string user = GetUserEmail();
             if (!String.IsNullOrEmpty(user))
             {
-                string uri = "http://localhost:18323/api/MarkedLocations/MarkLocation";
+                string uri = ConfigurationManager.AppSettings["APIurl"] + "/api/MarkedLocations/MarkLocation";
                 HttpClient client = new HttpClient();
 
                 var formVars = new Dictionary<string, string>();

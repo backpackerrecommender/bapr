@@ -7,7 +7,10 @@ namespace BaprAPI.Models
 {
     public static class Constants
     {
-        public static string StoreLocation = "D:\\brightstar";
+        public static string StoreLocation
+        {
+            get { return System.AppDomain.CurrentDomain.BaseDirectory.ToString(); }
+        }
 
         public static string storeConnectionString = "type=embedded;storesdirectory=" + Constants.StoreLocation + ";storename=Users";
         

@@ -70,7 +70,7 @@ namespace BaprAPI.Controllers
         public string GetUserPreference(string user)
         {
             UserPreferenceModel usrPreference = null;
-            string connectionString = "type=embedded;storesdirectory=" + "D:\\brightstar" + ";storename=Users";
+            string connectionString = "type=embedded;storesdirectory=" + Constants.StoreLocation + ";storename=Users";
             var client = BrightstarService.GetClient(connectionString);
 
 
